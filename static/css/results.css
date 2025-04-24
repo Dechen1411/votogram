@@ -1,0 +1,13 @@
+.results{
+    width: 70%;
+    height: 10vh;
+    /* background-color: grey; */
+    padding: 30rem;
+    font-size: large;
+}
+
+main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
