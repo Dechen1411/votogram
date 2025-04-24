@@ -1,0 +1,133 @@
+/* Dashboard Styles */
+.dashboard-container {
+    padding: 150px 0 100px;
+}
+
+.dashboard-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.dashboard-nav button {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    position: relative;
+}
+
+.dashboard-nav button.active {
+    color: #4a6bff;
+}
+
+.dashboard-nav button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #4a6bff;
+}
+
+.poll-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.poll-section.active {
+    display: block;
+}
+
+.poll-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="datetime-local"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.option-input {
+    display: flex;
+    margin-bottom: 0.5rem;
+}
+
+.option-input input {
+    flex-grow: 1;
+    margin-right: 0.5rem;
+}
+
+.remove-option {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    width: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.remove-option:disabled {
+    background: #ddd;
+    cursor: not-allowed;
+}
+
+.btn-primary-h {
+    background: #4a6bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary-h:hover {
+    background: #3a5bef;
+}
+
+.btn-secondary-h {
+    background: #f0f0f0;
+    color: #333;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

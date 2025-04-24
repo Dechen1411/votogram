@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votogram - userdashoard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo-h">
+                    <i class="fas fa-vote-yea"></i>
+                    Votogram
+                </a>
+                <div class="auth-links-h">
+                    <a href="/profile" style="color: black;">Profile</a>
+                    <a href="/results" style="color: black;">Results</a>
+                    <a href="/logout" class="btn">Logout</a>
+                </div>                
+            </nav>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="dashboard-nav">
+            <button id="createPollTab" class="active">Create Poll</button>
+            <button id="joinPollTab">Join Poll</button>
+        </div>
+
+        <!-- Create Poll Section -->
+        <section id="createPollSection" class="poll-section active">
+            <form class="poll-form">
+                <div class="form-group">
+                    <label for="pollTitle">Poll Question</label>
+                    <input type="text" id="pollTitle" placeholder="Enter your poll question" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Poll Options</label>
+                    <div id="pollOptions">
+                        <div class="option-input">
+                            <input type="text" placeholder="Option 1" required>
+                            <button type="button" class="remove-option" disabled>&times;</button>
+                        </div>
+                        <div class="option-input">
+                            <input type="text" placeholder="Option 2" required>
+                            <button type="button" class="remove-option" disabled>&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" id="addOption" class="btn-secondary-h">+ Add Option</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="pollExpiry">Expiry Date/Time</label>
+                    <input type="datetime-local" id="pollExpiry" required>
+                </div>
+
+                <button type="submit" class="btn-primary-h">Create Poll</button>
+            </form>
+        </section>
+
+        <!-- Join Poll Section -->
+        <section id="joinPollSection" class="poll-section">
+            <form class="poll-form">
+                <div class="form-group">
+                    <label for="pollKey">Poll Key</label>
+                    <input type="text" id="pollKey" placeholder="Enter the poll key" required>
+                    <p class="hint">Get the poll key from the poll creator</p>
+                </div>
+                <button type="submit" class="btn-primary-h">Join Poll</button>
+            </form>
+        </section>
+    </main>
+
+<footer>
+    <div class="container">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <i class="fas fa-vote-yea"></i>
+                    Votogram
+                </a>
+                <p>We secure your votes!</p>
+            </div>
+                
+            <div class="footer-links">
+                <div class="links-column">
+                    <h3 class="footer-heading">HELP & INFORMATION</h3>
+                    <ul>
+                        <li><a href="#">Terms & Condition</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                    
+                <div class="links-column" style="margin-top: 1.7rem;">
+                    <h3 class="footer-heading">&nbsp;</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help Center</a></li>
+                    </ul>
+                </div>
+                    
+                <div class="links-column">
+                    <h3 class="footer-heading">QUICK LINKS</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Book Now</a></li>
+                    </ul>
+                </div>
+                    
+                <div class="links-column">
+                    <h3 class="footer-heading">&nbsp;</h3>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+            
+        <div class="footer-bottom">
+            <p>Gyalpozhing College of Information Technology, Kabesa</p>
+        </div>
+    </div>
+</footer>
+</body>
+<script src="/static/js/dashboard.js"></script>
+</html>

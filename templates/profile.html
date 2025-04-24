@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votogram - profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo-h">
+                    <i class="fas fa-vote-yea"></i>
+                    Votogram
+                </a>
+                <div class="auth-links-h">
+                    <a href="/profile" style="color: black;">Profile</a>
+                    <a href="/results" style="color: black;">Results</a>
+                    <a href="/logout" class="btn">Logout</a>
+                </div>                
+            </nav>
+        </div>
+    </header>
+
+    <main class="profile-container">
+        <div class="profile-header">
+            <div class="avatar-container">
+                <img src="/static/images/default-avatar.jpg" alt="Profile Picture" class="profile-avatar" id="profileAvatar">
+                <div class="avatar-actions">
+                    <button id="changeAvatarBtn"><i class="fas fa-camera"></i> Change Photo</button>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                </div>
+            </div>
+            <h1>My Profile</h1>
+        </div>
+
+        <div class="profile-form-container">
+        <form id="profileForm" class="profile-form">
+            <div class="form-section">
+                <h2><i class="fas fa-user"></i> Basic Information</h2>
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" value="{{.User.FullName}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" value="{{.User.Email}}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="{{.User.PhoneNumber}}">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2><i class="fas fa-lock"></i> Security</h2>
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="currentPassword" name="currentPassword">
+                        <i class="fas fa-eye toggle-password"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="newPassword" name="newPassword">
+                        <i class="fas fa-eye toggle-password"></i>
+                    </div>
+                    <div class="password-strength">
+                        <span class="strength-bar"></span>
+                        <span class="strength-bar"></span>
+                        <span class="strength-bar"></span>
+                        <span class="strength-text">Password Strength</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword">
+                        <i class="fas fa-eye toggle-password"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
+                <button type="submit" id="saveBtn" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
+        </div>
+    </main>
+
+<footer>
+    <div class="container">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <i class="fas fa-vote-yea"></i>
+                    Votogram
+                </a>
+                <p>We secure your votes!</p>
+            </div>
+                
+            <div class="footer-links">
+                <div class="links-column">
+                    <h3 class="footer-heading">HELP & INFORMATION</h3>
+                    <ul>
+                        <li><a href="#">Terms & Condition</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                    
+                <div class="links-column" style="margin-top: 1.7rem;">
+                    <h3 class="footer-heading">&nbsp;</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help Center</a></li>
+                    </ul>
+                </div>
+                    
+                <div class="links-column">
+                    <h3 class="footer-heading">QUICK LINKS</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Book Now</a></li>
+                    </ul>
+                </div>
+                    
+                <div class="links-column">
+                    <h3 class="footer-heading">&nbsp;</h3>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+            
+        <div class="footer-bottom">
+            <p>Gyalpozhing College of Information Technology, Kabesa</p>
+        </div>
+    </div>
+</footer>
+</body>
+<script src="/static/js/profile.js"></script>
+</html>
