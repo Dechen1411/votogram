@@ -62,3 +62,23 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 func ResultsHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "templates/results.html")
 }
+
+func TermsHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/terms.html")
+}
+
+func PrivacyHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/privacy.html")
+}
+
+func FaqHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/faq.html")
+}
+
+func AboutUsHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/about.html")
+}
+
+func ContactHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/contactus.html")
+}

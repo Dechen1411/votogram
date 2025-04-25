@@ -20,6 +20,11 @@ func RegisterRoutes() *mux.Router {
 	router.HandleFunc("/results", controller.ResultsHandler).Methods("GET")
 	router.HandleFunc("/logout", controller.LogoutHandler).Methods("GET")
 	router.HandleFunc("/update-profile", controller.UpdateProfileHandler).Methods("POST")
+	router.HandleFunc("/terms", controller.TermsHandler).Methods("GET")
+	router.HandleFunc("/privacy", controller.PrivacyHandler).Methods("GET")
+	router.HandleFunc("/faq", controller.FaqHandler).Methods("GET")
+	router.HandleFunc("/aboutus", controller.AboutUsHandler).Methods("GET")
+	router.HandleFunc("/contact", controller.ContactHandler).Methods("GET")
 
 	// Static file serving
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
