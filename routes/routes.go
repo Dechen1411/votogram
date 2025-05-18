@@ -26,6 +26,15 @@ func RegisterRoutes() *mux.Router {
 	router.HandleFunc("/aboutus", controller.AboutUsHandler).Methods("GET")
 	router.HandleFunc("/contact", controller.ContactHandler).Methods("GET")
 
+	router.HandleFunc("/api/polls", controller.CreatePollHandler).Methods("POST")
+	router.HandleFunc("/api/polls/join", controller.JoinPollHandler).Methods("POST")
+	router.HandleFunc("/api/polls/expired", controller.ListExpiredPollsHandler).Methods("GET")
+	router.HandleFunc("/api/polls/{pollID}", controller.PollDetailsHandler).Methods("GET")
+	router.HandleFunc("/api/polls/{pollID}/results", controller.PollResultsHandler).Methods("GET")
+
+	router.HandleFunc("/vote", controller.VoteHandler).Methods("GET")
+	router.HandleFunc("/api/vote", controller.SubmitVoteHandler).Methods("POST")
+
 	// Static file serving
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 

@@ -19,6 +19,9 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
 	// Parse and execute the home.html template
 	tmpl, err := template.ParseFiles("templates/home.html")
 	if err != nil {
@@ -54,12 +57,19 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	tmpl := template.Must(template.ParseFiles("templates/profile.html"))
 	data := struct{ User model.User }{user}
 	tmpl.Execute(w, data)
 }
 
 func ResultsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
 	http.ServeFile(w, r, "templates/results.html")
 }
 

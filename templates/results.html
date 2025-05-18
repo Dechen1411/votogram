@@ -1,15 +1,13 @@
+<!-- results.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votogram - results</title>
+    <title>Votogram - Results</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/results.css">
-    <style>
-        
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -31,61 +29,145 @@
 
     <main>
         <div class="results">
-            No results
+            <div class="results-container">
+                <h1 id="page-title">Poll Results</h1>
+                <div id="polls-list"></div>
+                <div id="results-container"></div>
+            </div>
         </div>
     </main>
 
-
-</body>
-<footer>
-    <div class="container">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <a href="#" class="logo">
-                    <i class="fas fa-vote-yea"></i>
-                    Votogram
-                </a>
-                <p>We secure your votes!</p>
-            </div>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <i class="fas fa-vote-yea"></i>
+                        Votogram
+                    </a>
+                    <p>We secure your votes!</p>
+                </div>
                 
-            <div class="footer-links">
-                <div class="links-column">
-                    <h3 class="footer-heading">HELP & INFORMATION</h3>
-                    <ul>
-                        <li><a href="#">Terms & Condition</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
+                <div class="footer-links">
+                    <div class="links-column">
+                        <h3 class="footer-heading">HELP & INFORMATION</h3>
+                        <ul>
+                            <li><a href="#">Terms & Condition</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </div>
                     
-                <div class="links-column" style="margin-top: 1.7rem;">
-                    <h3 class="footer-heading">&nbsp;</h3>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Help Center</a></li>
-                    </ul>
-                </div>
+                    <div class="links-column" style="margin-top: 1.7rem;">
+                        <h3 class="footer-heading"> </h3>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Help Center</a></li>
+                        </ul>
+                    </div>
                     
-                <div class="links-column">
-                    <h3 class="footer-heading">QUICK LINKS</h3>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                    </ul>
-                </div>
+                    <div class="links-column">
+                        <h3 class="footer-heading">QUICK LINKS</h3>
+                        <ul>
+                            <li><a href="#">Home</a></li>
+                        </ul>
+                    </div>
                     
-                <div class="links-column">
-                    <h3 class="footer-heading">&nbsp;</h3>
-                    <ul>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
+                    <div class="links-column">
+                        <h3 class="footer-heading"> </h3>
+                        <ul>
+                            <li><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
             
-        <div class="footer-bottom">
-            <p>Gyalpozhing College of Information Technology, Kabesa</p>
+            <div class="footer-bottom">
+                <p>Gyalpozhing College of Information Technology, Kabesa</p>
+            </div>
         </div>
-    </div>
-</footer>
-<script src="/static/js/dashboard.js"></script>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pollID = urlParams.get('id');
+            const pollsList = document.getElementById('polls-list');
+            const resultsContainer = document.getElementById('results-container');
+
+            if (!pollID) {
+                // No poll ID provided, show list of expired polls
+                try {
+                    const response = await fetch('/api/polls/expired', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include' // Add this to send session cookies
+                });
+                    if (!response.ok) {
+                        throw new Error('Failed to load polls');
+                    }
+                    const polls = await response.json();
+
+                    if (polls.length === 0) {
+                        pollsList.innerHTML = '<p class="error-message">No expired polls found.</p>';
+                        return;
+                    }
+
+                    pollsList.innerHTML = '<h2>Select a Poll to View Results</h2>';
+                    const ul = document.createElement('ul');
+                    ul.style.listStyle = 'none';
+                    ul.style.padding = '0';
+                    polls.forEach(poll => {
+                        const li = document.createElement('li');
+                        li.style.margin = '0.5rem 0';
+                        li.innerHTML = `<a href="/results?id=${poll.id}" style="text-decoration: none; color: #007bff;">${poll.title} (Expired: ${poll.expires_at})</a>`;
+                        ul.appendChild(li);
+                    });
+                    pollsList.appendChild(ul);
+                } catch (error) {
+                    pollsList.innerHTML = '<p class="error-message">Error loading polls</p>';
+                }
+            } else {
+                // Poll ID provided, show results
+                try {
+                    const response = await fetch(`/api/polls/${pollID}/results`);
+                    if (!response.ok) {
+                        const error = await response.json();
+                        resultsContainer.innerHTML = `<p class="error-message">${error.message}</p>`;
+                        return;
+                    }
+
+                    const data = await response.json();
+                    
+                    // Update page title and info
+                    document.getElementById('page-title').textContent = data.title;
+                    pollsList.innerHTML = `<p class="poll-info">Expired on ${data.expires_at} | Total Votes: ${data.total_votes}</p>`;
+
+                    // Display results
+                    data.results.forEach(result => {
+                        const percentage = data.total_votes > 0 
+                            ? ((result.vote_count / data.total_votes) * 100).toFixed(1) 
+                            : 0;
+                        
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'result-item';
+                        resultItem.innerHTML = `
+                            <p>${result.text}: ${result.vote_count} votes (${percentage}%)</p>
+                            <div class="result-bar">
+                                <div class="result-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        `;
+                        resultsContainer.appendChild(resultItem);
+                    });
+                } catch (error) {
+                    resultsContainer.innerHTML = '<p class="error-message">Error loading results</p>';
+                }
+            }
+        });
+    </script>
+</body>
 </html>
