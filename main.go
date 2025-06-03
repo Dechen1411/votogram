@@ -4,13 +4,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"votogram/routes" // Replace with your actual module name
+	"votogram/routes" // Update to your actual module name if different
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Fallback port for local development
+	}
+
 	router := routes.RegisterRoutes()
 
-	fmt.Println("Server running at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	fmt.Printf("Server running at http://localhost:%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }

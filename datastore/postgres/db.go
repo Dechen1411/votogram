@@ -3,36 +3,30 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
-// db details
-const (
-	postgres_host     = "db"
-	postgres_port     = 5432
-	postgres_user     = "postgres"
-	postgres_password = "postgres"
-	postgres_dbname   = "votogram_db"
-)
-
-// create pointer variable Db which points to sql driver
 var Db *sql.DB
 
 func init() {
-	// creating a database connection string
-	db_info := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		postgres_host, postgres_port, postgres_user, postgres_password, postgres_dbname)
-	fmt.Println(db_info)
+	// Get DB credentials from environment variables
+	host := os.Getenv("POSTGRES_HOST")
+	port := os.Getenv("POSTGRES_PORT")
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	dbname := os.Getenv("POSTGRES_DBNAME")
 
-	// var err error
-	// establish a connection to PostgreSQL server using the driver
+	// Build connection string
+	db_info := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require",
+		host, port, user, password, dbname)
+	fmt.Println("Connecting to DB with:", db_info)
+
 	var err error
 	Db, err = sql.Open("postgres", db_info)
-	// handle error
 	if err != nil {
 		panic(err)
-	} else {
-		fmt.Println("Database successfully connected")
 	}
+	fmt.Println("Database successfully connected")
 }
