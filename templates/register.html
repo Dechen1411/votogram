@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Votogram - Register</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="/static/css/register.css">
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-vote-yea"></i>
+                    <span>Votogram</span>
+                </div>
                 <h1>Create Your Account</h1>
                 <p>Join Votogram to participate in secure online voting</p>
             </div>
@@ -18,26 +23,38 @@
             <form id="registrationForm" class="auth-form">
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" name="fullName" pattern="[A-Za-z\s]{3,}" title="Name should only contain letters and spaces, minimum 3 characters." required>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" pattern="[A-Za-z\s]{3,}" title="Name should only contain letters and spaces, minimum 3 characters" required>
+                    </div>
                     <div class="error-message" id="fullNameError"></div>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
                     <div class="error-message" id="emailError"></div>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" required>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                    </div>
                     <div class="error-message" id="phoneError"></div>
                 </div>
 
                 <div class="form-group">    
                     <label for="password">Password</label>
                     <div class="password-wrapper">
-                        <input type="password" id="password" name="password" required>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" placeholder="Create a password" required>
+                        </div>
                         <i class="fas fa-eye toggle-password"></i>
                     </div>
                     <div class="error-message" id="passwordError"></div>
@@ -46,13 +63,19 @@
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password</label>
                     <div class="password-wrapper">
-                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                        </div>
                         <i class="fas fa-eye toggle-password"></i>
                     </div>
                     <div class="error-message" id="confirmPasswordError"></div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" onclick="signUp()">Register</button>
+                <button type="submit" class="btn btn-primary">
+                    <span>Register</span>
+                    <i class="fas fa-user-plus"></i>
+                </button>
             </form>
 
             <div class="auth-footer">

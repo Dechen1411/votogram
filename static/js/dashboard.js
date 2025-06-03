@@ -1,4 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Function to create and show modal
+    function showModal(message, type = 'success') {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
+                <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close modal on click
+        modal.querySelector('.close').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
     // Tab switching
     const createPollTab = document.getElementById('createPollTab');
     const joinPollTab = document.getElementById('joinPollTab');
@@ -69,13 +96,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const localExpiry = new Date(expiryInput.value);
         const now = new Date();
         if (localExpiry <= now) {
-            alert('Expiry time must be in the future.');
+            showModal('Expiry time must be in the future.', 'error');
             return;
         }
         const utcExpiry = localExpiry.toISOString().slice(0, 16); // Format: 2006-01-02T15:04
 
         if (title === '' || options.length < 2 || !expiryInput.value) {
-            alert('Please fill all fields with at least 2 options.');
+            showModal('Please fill all fields with at least 2 options.', 'error');
             return;
         }
 
@@ -118,8 +145,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // Disable remove buttons if only 2 options
             document.querySelectorAll('.remove-option').forEach(btn => btn.disabled = true);
 
+            showModal(`Poll created successfully! Your poll key is: ${data.poll_key}`, 'success');
+
         } catch (err) {
-            alert('Error: ' + err.message);
+            showModal('Error: ' + err.message, 'error');
         }
     });
 
@@ -128,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         const pollKey = document.getElementById('pollKey').value.trim();
         if (!pollKey) {
-            alert('Please enter a valid poll key.');
+            showModal('Please enter a valid poll key.', 'error');
             return;
         }
 
@@ -151,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = `/vote?id=${pollID}`;
 
         } catch (err) {
-            alert('Error: ' + err.message);
+            showModal('Error: ' + err.message, 'error');
         }
     });
 
@@ -188,14 +217,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             polls.forEach(poll => {
-                const isExpired = new Date(poll.expiry) < new Date();
                 const pollItem = document.createElement('div');
                 pollItem.className = 'poll-item';
                 pollItem.innerHTML = `
                     <h3>${poll.title}</h3>
                     <p>Poll Key: ${poll.poll_key}</p>
-                    <p>Status: <span class="${isExpired ? 'status-expired' : 'status-active'}">
-                        ${isExpired ? 'Expired' : 'Active'}</span></p>
                 `;
                 pollsList.appendChild(pollItem);
             });

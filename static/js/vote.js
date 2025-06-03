@@ -1,11 +1,51 @@
 document.addEventListener('DOMContentLoaded', async function () {
+    // Function to create and show modal
+    function showModal(message, type = 'success') {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
+                <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close modal on click
+        modal.querySelector('.close').addEventListener('click', () => {
+            modal.remove();
+            if (type === 'error') {
+                window.location.href = '/home';
+            }
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                if (type === 'error') {
+                    window.location.href = '/home';
+                }
+            }
+        });
+
+        // Auto-redirect on success after 2 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                modal.remove();
+                window.location.href = '/home';
+            }, 2000);
+        }
+    }
+
     // Get poll ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const pollID = urlParams.get('id');
     
     if (!pollID) {
-        alert('Invalid poll link');
-        window.location.href = '/';
+        showModal('Invalid poll link', 'error');
         return;
     }
 
@@ -22,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const expiryDate = new Date(pollData.expires_at);
         const now = new Date();
         if (now > expiryDate) {
-            alert('This poll has expired.');
+            showModal('This poll has expired.', 'error');
             document.getElementById('voting-form').style.display = 'none';
             return;
         }
@@ -55,8 +95,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             optionsContainer.appendChild(optionDiv);
         });
     } catch (error) {
-        alert('Error loading poll: ' + error.message);
-        window.location.href = '/home';
+        showModal('Error loading poll: ' + error.message, 'error');
+        return;
     }
 
     // Handle vote submission
@@ -65,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         
         const selectedOption = document.querySelector('input[name="pollOption"]:checked');
         if (!selectedOption) {
-            alert('Please select an option');
+            showModal('Please select an option', 'error');
             return;
         }
 
@@ -86,10 +126,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 throw new Error(error.message || 'Failed to submit vote');
             }
 
-            alert('Your vote has been recorded successfully!');
-            window.location.href = '/home'; // Redirect to home page after voting
+            showModal('Your vote has been recorded successfully!', 'success');
         } catch (error) {
-            alert('Error submitting vote: ' + error.message);
+            showModal('Error submitting vote: ' + error.message, 'error');
         }
     });
 });
