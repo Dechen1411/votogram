@@ -2,79 +2,180 @@
 main {
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    align-items: flex-start;
+    min-height: calc(100vh - 120px);
+    padding: 8rem 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
 }
 
 .results {
-    width: 70%;
-    padding: 2rem;
-    font-size: large;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 900px;
+    padding: 2.5rem;
+    font-size: 1.1rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.results:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px);
 }
 
 .results-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
+    margin: 0 auto;
 }
 
-.poll-title {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    color: #333;
+#page-title {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    text-align: center;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+#page-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    border-radius: 3px;
 }
 
 .poll-info {
-    color: #666;
-    margin-bottom: 1rem;
+    color: #7f8c8d;
+    margin-bottom: 2rem;
     font-size: 1rem;
+    text-align: center;
+    padding: 0.8rem;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
 }
 
 .result-item {
-    margin: 1rem 0;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.result-item:hover {
+    transform: translateY(-3px);
+}
+
+.result-item p {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: #34495e;
+    font-weight: 500;
 }
 
 .result-bar {
-    background-color: #e0e0e0;
-    height: 20px;
-    border-radius: 10px;
+    background-color: #ecf0f1;
+    height: 24px;
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .result-fill {
-    background-color: #4CAF50;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
     height: 100%;
-    transition: width 0.3s ease-in-out;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
 }
 
-.error-message {
-    color: red;
+.n-message{
     text-align: center;
     margin: 2rem;
     font-size: 1.2rem;
+    padding: 1rem;
+    background-color: #fdedee;
+    border-radius: 6px;
 }
 
-#polls-list ul {
+.error-message {
+    color: #e74c3c;
+    text-align: center;
+    margin: 2rem;
+    font-size: 1.2rem;
+    padding: 1rem;
+    background-color: #fdedee;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+}
+
+.poll-list {
     list-style: none;
     padding: 0;
+    margin: 2rem 0;
 }
 
-#polls-list li {
-    margin: 0.5rem 0;
+.poll-list li {
+    margin: 1rem 0;
+    transition: transform 0.2s ease;
 }
 
-#polls-list a {
+.poll-list li:hover {
+    transform: translateX(5px);
+}
+
+.poll-link {
     text-decoration: none;
-    color: #007bff;
+    color: #3498db;
+    font-size: 1.1rem;
+    display: block;
+    padding: 0.8rem 1rem;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
 }
 
-#polls-list a:hover {
-    text-decoration: underline;
+.poll-link:hover {
+    text-decoration: none;
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #2980b9;
+}
+
+.poll-list h2 {
+    font-size: 1.6rem;
+    color: #2c3e50;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .results {
+        width: 95%;
+        padding: 1.5rem;
+    }
+    
+    #page-title {
+        font-size: 1.8rem;
+    }
+    
+    .result-item {
+        padding: 1rem;
+    }
 }

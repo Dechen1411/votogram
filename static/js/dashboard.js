@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
         optionDiv.className = 'option-input';
         optionDiv.innerHTML = `
             <input type="text" placeholder="Option ${optionCount}" required>
-            <button type="button" class="remove-option">&times;</button>
+            <button type="button" class="remove-option">×</button>
         `;
         pollOptions.appendChild(optionDiv);
 
@@ -56,104 +56,163 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // CREATE POLL submission
-document.querySelector('#createPollSection form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const titleInput = document.getElementById('pollTitle');
-    const expiryInput = document.getElementById('pollExpiry');
-    const optionsInputs = pollOptions.querySelectorAll('input');
+    document.querySelector('#createPollSection form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const titleInput = document.getElementById('pollTitle');
+        const expiryInput = document.getElementById('pollExpiry');
+        const optionsInputs = pollOptions.querySelectorAll('input');
 
-    const title = titleInput.value.trim();
-    const options = Array.from(optionsInputs).map(input => input.value.trim()).filter(opt => opt);
+        const title = titleInput.value.trim();
+        const options = Array.from(optionsInputs).map(input => input.value.trim()).filter(opt => opt);
 
-    // Convert expiry to UTC
-    const localExpiry = new Date(expiryInput.value);
-    const now = new Date();
-    if (localExpiry <= now) {
-        alert('Expiry time must be in the future.');
-        return;
-    }
-    const utcExpiry = localExpiry.toISOString().slice(0, 16); // Format: 2006-01-02T15:04
+        // Convert expiry to UTC
+        const localExpiry = new Date(expiryInput.value);
+        const now = new Date();
+        if (localExpiry <= now) {
+            alert('Expiry time must be in the future.');
+            return;
+        }
+        const utcExpiry = localExpiry.toISOString().slice(0, 16); // Format: 2006-01-02T15:04
 
-    if (title === '' || options.length < 2 || !expiryInput.value) {
-        alert('Please fill all fields with at least 2 options.');
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/polls', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title, options, expiry: utcExpiry })
-        });
-
-        if (!res.ok) {
-            const errText = await res.text();
-            throw new Error(errText || 'Failed to create poll');
+        if (title === '' || options.length < 2 || !expiryInput.value) {
+            alert('Please fill all fields with at least 2 options.');
+            return;
         }
 
-        const data = await res.json();
+        try {
+            const res = await fetch('/api/polls', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, options, expiry: utcExpiry })
+            });
 
-        // Display the poll key on the page
-        const resultDiv = document.getElementById('pollResult');
-        resultDiv.textContent = `Poll created successfully! Your poll key is: ${data.poll_key}`;
-        resultDiv.style.display = 'block';
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(errText || 'Failed to create poll');
+            }
 
-        // Reset form fields
-        titleInput.value = '';
-        expiryInput.value = '';
+            const data = await res.json();
 
-        // Keep only 2 option inputs
-        while (pollOptions.children.length > 2) {
-            pollOptions.lastChild.remove();
+            // Display the poll key on the page
+            const resultDiv = document.getElementById('pollResult');
+            resultDiv.textContent = `Poll created successfully! Your poll key is: ${data.poll_key}`;
+            resultDiv.style.display = 'block';
+
+            // Reset form fields
+            titleInput.value = '';
+            expiryInput.value = '';
+
+            // Keep only 2 option inputs
+            while (pollOptions.children.length > 2) {
+                pollOptions.lastChild.remove();
+            }
+
+            // Reset the first two option inputs
+            pollOptions.querySelectorAll('input').forEach((input, idx) => {
+                input.value = '';
+                input.placeholder = `Option ${idx + 1}`;
+            });
+
+            // Disable remove buttons if only 2 options
+            document.querySelectorAll('.remove-option').forEach(btn => btn.disabled = true);
+
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+
+    // JOIN POLL submission
+    document.querySelector('#joinPollSection form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const pollKey = document.getElementById('pollKey').value.trim();
+        if (!pollKey) {
+            alert('Please enter a valid poll key.');
+            return;
         }
 
-        // Reset the first two option inputs
-        pollOptions.querySelectorAll('input').forEach((input, idx) => {
-            input.value = '';
-            input.placeholder = `Option ${idx + 1}`;
-        });
+        try {
+            const res = await fetch('/api/polls/join', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ poll_key: pollKey })
+            });
 
-        // Disable remove buttons if only 2 options
-        document.querySelectorAll('.remove-option').forEach(btn => btn.disabled = true);
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(errText || 'Invalid poll key or expired poll.');
+            }
 
-    } catch (err) {
-        alert('Error: ' + err.message);
-    }
-});
-    
+            const data = await res.json();
+            const pollID = data.poll_id;
+            
+            // Redirect to voting page with poll ID
+            window.location.href = `/vote?id=${pollID}`;
 
-   // JOIN POLL submission
-document.querySelector('#joinPollSection form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const pollKey = document.getElementById('pollKey').value.trim();
-    if (!pollKey) {
-        alert('Please enter a valid poll key.');
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/polls/join', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ poll_key: pollKey })
-        });
-
-        if (!res.ok) {
-            const errText = await res.text();
-            throw new Error(errText || 'Invalid poll key or expired poll.');
+        } catch (err) {
+            alert('Error: ' + err.message);
         }
+    });
 
-        const data = await res.json();
-        const pollID = data.poll_id;
-        
-        // Redirect to voting page with poll ID
-        window.location.href = `/vote?id=${pollID}`;
+    // View Polls Modal
+    const viewPollsBtn = document.getElementById('viewPollsBtn');
+    const pollsModal = document.getElementById('pollsModal');
+    const closeModal = document.getElementById('closeModal');
+    const pollsList = document.getElementById('pollsList');
 
-    } catch (err) {
-        alert('Error: ' + err.message);
-    }
-});
-    
+    viewPollsBtn.addEventListener('click', async function () {
+        pollsList.innerHTML = '<div class="loading-input"></div>'; // Show loading state
+        pollsModal.style.display = 'flex';
+
+        try {
+            const res = await fetch('/api/polls/user', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include' // Ensure session cookie is sent
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP ${res.status}`);
+            }
+
+            const data = await res.json();
+            const polls = Array.isArray(data) ? data : [];
+            console.log('User polls response:', polls); // Debug response
+            pollsList.innerHTML = ''; // Clear loading state
+
+            if (polls.length === 0) {
+                pollsList.innerHTML = '<p class="info-message">No polls created yet.</p>';
+                return;
+            }
+
+            polls.forEach(poll => {
+                const isExpired = new Date(poll.expiry) < new Date();
+                const pollItem = document.createElement('div');
+                pollItem.className = 'poll-item';
+                pollItem.innerHTML = `
+                    <h3>${poll.title}</h3>
+                    <p>Poll Key: ${poll.poll_key}</p>
+                    <p>Status: <span class="${isExpired ? 'status-expired' : 'status-active'}">
+                        ${isExpired ? 'Expired' : 'Active'}</span></p>
+                `;
+                pollsList.appendChild(pollItem);
+            });
+        } catch (err) {
+            console.error('Error fetching user polls:', err);
+            pollsList.innerHTML = `<p class="error-message">Failed to fetch polls: ${err.message}</p>`;
+        }
+    });
+
+    closeModal.addEventListener('click', function () {
+        pollsModal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function (e) {
+        if (e.target === pollsModal) {
+            pollsModal.style.display = 'none';
+        }
+    });
 });

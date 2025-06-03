@@ -20,6 +20,7 @@ func RegisterRoutes() *mux.Router {
 	router.HandleFunc("/results", controller.ResultsHandler).Methods("GET")
 	router.HandleFunc("/logout", controller.LogoutHandler).Methods("GET")
 	router.HandleFunc("/update-profile", controller.UpdateProfileHandler).Methods("POST")
+	router.HandleFunc("/api/upload-avatar", controller.UploadAvatarHandler).Methods("POST")
 	router.HandleFunc("/terms", controller.TermsHandler).Methods("GET")
 	router.HandleFunc("/privacy", controller.PrivacyHandler).Methods("GET")
 	router.HandleFunc("/faq", controller.FaqHandler).Methods("GET")
@@ -29,6 +30,7 @@ func RegisterRoutes() *mux.Router {
 	router.HandleFunc("/api/polls", controller.CreatePollHandler).Methods("POST")
 	router.HandleFunc("/api/polls/join", controller.JoinPollHandler).Methods("POST")
 	router.HandleFunc("/api/polls/expired", controller.ListExpiredPollsHandler).Methods("GET")
+	router.HandleFunc("/api/polls/user", controller.ListUserPollsHandler).Methods("GET")
 	router.HandleFunc("/api/polls/{pollID}", controller.PollDetailsHandler).Methods("GET")
 	router.HandleFunc("/api/polls/{pollID}/results", controller.PollResultsHandler).Methods("GET")
 

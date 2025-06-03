@@ -191,7 +191,6 @@ func VoteHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal("Error executing template: ", err)
 	}
-
 }
 
 func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
@@ -208,7 +207,6 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println("Failed to decode vote request:", err)
-		// Return JSON error response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -218,15 +216,36 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if user is the poll creator
+	var creatorEmail string
+	err := postgres.Db.QueryRow(`SELECT creator_email FROM polls WHERE id = $1`, req.PollID).Scan(&creatorEmail)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "error",
+			"message": "Poll not found",
+		})
+		return
+	}
+	if creatorEmail == email {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "error",
+			"message": "Poll creators cannot vote in their own polls",
+		})
+		return
+	}
+
 	// Check if user already voted
 	var alreadyVoted bool
-	err := postgres.Db.QueryRow(`
+	err = postgres.Db.QueryRow(`
         SELECT EXISTS(
             SELECT 1 FROM votes 
             WHERE poll_id = $1 AND voter_email = $2
         )`, req.PollID, email).Scan(&alreadyVoted)
 	if err != nil {
-		// Return JSON error response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -236,7 +255,6 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if alreadyVoted {
-		// Return JSON error response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -254,7 +272,6 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
             WHERE id = $1 AND poll_id = $2
         )`, req.OptionID, req.PollID).Scan(&validOption)
 	if err != nil || !validOption {
-		// Return JSON error response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -269,7 +286,6 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
         INSERT INTO votes (poll_id, option_id, voter_email)
         VALUES ($1, $2, $3)`, req.PollID, req.OptionID, email)
 	if err != nil {
-		// Return JSON error response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -279,7 +295,6 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return success response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
@@ -287,8 +302,6 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
 		"message": "Vote recorded successfully",
 	})
 }
-
-// Add this handler to the controller file
 
 func PollDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -341,16 +354,13 @@ func PollDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		} `json:"options"`
 	}{
 		Title:     title,
-		ExpiresAt: expiresAt.UTC().Format("2006-01-02T15:04:05Z"), // ISO format
+		ExpiresAt: expiresAt.UTC().Format("2006-01-02T15:04:05Z"),
 		Options:   options,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
-
-// user.go
-// Add this new handler after other handlers
 
 func PollResultsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -445,9 +455,6 @@ func PollResultsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// user.go
-// Add this handler after other handlers
-
 func ListExpiredPollsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling /api/polls/expired request")
 	sessionObj, _ := session.Store.Get(r, "votogram-session")
@@ -464,12 +471,119 @@ func ListExpiredPollsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Fetching expired polls for email: %s", email)
-	rows, err := postgres.Db.Query(`
+	// Query for polls created by the user
+	createdRows, err := postgres.Db.Query(`
+        SELECT id, title, expires_at
+        FROM polls
+        WHERE creator_email = $1 AND expires_at <= NOW()
+        ORDER BY expires_at DESC`, email)
+	if err != nil {
+		log.Printf("Database error (created polls): %v", err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "error",
+			"message": "Failed to fetch created polls",
+		})
+		return
+	}
+	defer createdRows.Close()
+
+	// Query for polls the user voted in (joined)
+	joinedRows, err := postgres.Db.Query(`
         SELECT DISTINCT p.id, p.title, p.expires_at
         FROM polls p
-        LEFT JOIN votes v ON p.id = v.poll_id
-        WHERE (p.creator_email = $1 OR v.voter_email = $1) AND p.expires_at <= NOW()
+        JOIN votes v ON p.id = v.poll_id
+        WHERE v.voter_email = $1 AND p.expires_at <= NOW()
         ORDER BY p.expires_at DESC`, email)
+	if err != nil {
+		log.Printf("Database error (joined polls): %v", err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "error",
+			"message": "Failed to fetch joined polls",
+		})
+		return
+	}
+	defer joinedRows.Close()
+
+	type Poll struct {
+		ID        int    `json:"id"`
+		Title     string `json:"title"`
+		ExpiresAt string `json:"expires_at"`
+	}
+
+	var createdPolls []Poll
+	for createdRows.Next() {
+		var poll Poll
+		var expiresAt time.Time
+		if err := createdRows.Scan(&poll.ID, &poll.Title, &expiresAt); err != nil {
+			log.Printf("Scan error (created polls): %v", err)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{
+				"status":  "error",
+				"message": "Failed to scan created polls",
+			})
+			return
+		}
+		poll.ExpiresAt = expiresAt.Format("January 2, 2006 15:04")
+		createdPolls = append(createdPolls, poll)
+	}
+
+	var joinedPolls []Poll
+	for joinedRows.Next() {
+		var poll Poll
+		var expiresAt time.Time
+		if err := joinedRows.Scan(&poll.ID, &poll.Title, &expiresAt); err != nil {
+			log.Printf("Scan error (joined polls): %v", err)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{
+				"status":  "error",
+				"message": "Failed to scan joined polls",
+			})
+			return
+		}
+		poll.ExpiresAt = expiresAt.Format("January 2, 2006 15:04")
+		joinedPolls = append(joinedPolls, poll)
+	}
+
+	response := struct {
+		CreatedPolls []Poll `json:"created_polls"`
+		JoinedPolls  []Poll `json:"joined_polls"`
+	}{
+		CreatedPolls: createdPolls,
+		JoinedPolls:  joinedPolls,
+	}
+
+	log.Printf("Returning %d created polls and %d joined polls", len(createdPolls), len(joinedPolls))
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func ListUserPollsHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling /api/polls/user request")
+	sessionObj, _ := session.Store.Get(r, "votogram-session")
+	email, ok := sessionObj.Values["email"].(string)
+	if !ok {
+		log.Println("Unauthorized: No valid session")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "error",
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	log.Printf("Fetching polls for user: %s", email)
+	rows, err := postgres.Db.Query(`
+        SELECT title, poll_key, expires_at
+        FROM polls
+        WHERE creator_email = $1
+        ORDER BY expires_at DESC`, email)
 	if err != nil {
 		log.Printf("Database error: %v", err)
 		w.Header().Set("Content-Type", "application/json")
@@ -483,16 +597,16 @@ func ListExpiredPollsHandler(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	type Poll struct {
-		ID        int    `json:"id"`
-		Title     string `json:"title"`
-		ExpiresAt string `json:"expires_at"`
+		Title   string `json:"title"`
+		PollKey string `json:"poll_key"`
+		Expiry  string `json:"expiry"`
 	}
 
 	var polls []Poll
 	for rows.Next() {
 		var poll Poll
 		var expiresAt time.Time
-		if err := rows.Scan(&poll.ID, &poll.Title, &expiresAt); err != nil {
+		if err := rows.Scan(&poll.Title, &poll.PollKey, &expiresAt); err != nil {
 			log.Printf("Scan error: %v", err)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -502,11 +616,11 @@ func ListExpiredPollsHandler(w http.ResponseWriter, r *http.Request) {
 			})
 			return
 		}
-		poll.ExpiresAt = expiresAt.Format("January 2, 2006 15:04")
+		poll.Expiry = expiresAt.UTC().Format("2006-01-02T15:04")
 		polls = append(polls, poll)
 	}
 
-	log.Printf("Returning %d expired polls", len(polls))
+	log.Printf("Returning %d polls for user", len(polls))
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(polls)
 }

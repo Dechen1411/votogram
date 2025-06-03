@@ -9,14 +9,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const strengthBars       = document.querySelectorAll('.strength-bar');
     const strengthText       = document.querySelector('.strength-text');
 
-    // Avatar preview (no server upload yet)
+    // Avatar upload
     changeAvatarBtn.addEventListener('click', () => avatarUpload.click());
-    avatarUpload.addEventListener('change', e => {
+    avatarUpload.addEventListener('change', async e => {
         const file = e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = ev => profileAvatar.src = ev.target.result;
-        reader.readAsDataURL(file);
+
+        // Upload to server
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        try {
+            const res = await fetch('/api/upload-avatar', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+            console.log('Avatar upload response:', data); // Log response for debugging
+            if (res.ok) {
+                // Update image only on success
+                profileAvatar.src = data.avatarPath;
+                alert(data.message);
+            } else {
+                console.error('Avatar upload error:', data);
+                alert(data.error || data.message || 'Avatar upload failed');
+            }
+        } catch (err) {
+            console.error('Avatar upload failed:', err);
+            alert('An unexpected error occurred during avatar upload.');
+        }
     });
 
     // Toggle visibility for all password fields
@@ -37,33 +58,33 @@ document.addEventListener('DOMContentLoaded', function() {
         if (/\d/.test(pwd)) score++;
         if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score++;
         if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++;
-        const colors = ['#ff4d4d','#ff9800','#4CAF50','#28a745'];
-        const texts  = ['Very Weak','Weak','Good','Strong'];
-        strengthBars.forEach((bar,i) => {
+        const colors = ['#ff4d4d', '#ff9800', '#4CAF50', '#28a745'];
+        const texts  = ['Very Weak', 'Weak', 'Good', 'Strong'];
+        strengthBars.forEach((bar, i) => {
             bar.style.backgroundColor = i < score ? colors[score-1] : '#ddd';
         });
         strengthText.textContent = score ? texts[score-1] : 'Password Strength';
     });
 
-    // Cancel → reload to reset fields to template-injected values
+    // Cancel → reload to reset fields
     cancelBtn.addEventListener('click', () => window.location.reload());
 
-    // Submit → POST to /update-profile
+    // Submit profile form
     profileForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Basic password match check
         const newPwd = document.getElementById('newPassword').value;
         const confirm = document.getElementById('confirmPassword').value;
         if (newPwd && newPwd !== confirm) {
-            return alert("New passwords don't match!");
+            alert("New passwords don't match!");
+            return;
         }
 
         const payload = {
-            fullName:       document.getElementById('fullName').value.trim(),
-            phone:          document.getElementById('phone').value.trim(),
+            fullName: document.getElementById('fullName').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
             currentPassword: document.getElementById('currentPassword').value,
-            newPassword:     newPwd,
+            newPassword: newPwd,
             confirmPassword: confirm
         };
 
@@ -74,14 +95,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
+            console.log('Profile update response:', data); // Log response for debugging
             if (res.ok) {
                 alert(data.message);
                 window.location.reload();
             } else {
+                console.error('Profile update error:', data);
                 alert(data.error || data.message || 'Update failed');
             }
         } catch (err) {
-            console.error(err);
+            console.error('Profile update failed:', err);
             alert('An unexpected error occurred.');
         }
     });

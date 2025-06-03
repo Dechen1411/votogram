@@ -1,4 +1,3 @@
-// vote.js
 document.addEventListener('DOMContentLoaded', async function () {
     // Get poll ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -30,7 +29,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Display poll info
         document.getElementById('poll-title').textContent = pollData.title;
-        document.getElementById('poll-expiry').textContent = `Closes on ${pollData.expires_at}`;
+        
+        // Format expiry date in local timezone (UTC+06:00)
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'Asia/Dhaka' // UTC+06:00
+        };
+        const formattedExpiry = expiryDate.toLocaleString('en-US', options);
+        document.getElementById('poll-expiry').textContent = `Closes on ${formattedExpiry}`;
         
         // Create options
         const optionsContainer = document.getElementById('options-container');
