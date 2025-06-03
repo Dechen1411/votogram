@@ -1,45 +1,45 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Function to create and show modal
-    function showModal(message, type = 'success') {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.style.display = 'flex';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <span class="close">×</span>
-                <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
-                <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
-            </div>
-        `;
-        document.body.appendChild(modal);
+// Function to create and show modal
+function showModal(message, type = 'success') {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
+            <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
+        </div>
+    `;
+    document.body.appendChild(modal);
 
-        // Close modal on click
-        modal.querySelector('.close').addEventListener('click', () => {
+    // Close modal on click
+    modal.querySelector('.close').addEventListener('click', () => {
+        modal.remove();
+        if (type === 'success') {
+            window.location.href = '/login';
+        }
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
             modal.remove();
             if (type === 'success') {
                 window.location.href = '/login';
             }
-        });
-
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.remove();
-                if (type === 'success') {
-                    window.location.href = '/login';
-                }
-            }
-        });
-
-        // Auto-redirect on success after 2 seconds
-        if (type === 'success') {
-            setTimeout(() => {
-                modal.remove();
-                window.location.href = '/login';
-            }, 2000);
         }
-    }
+    });
 
+    // Auto-redirect on success after 2 seconds
+    if (type === 'success') {
+        setTimeout(() => {
+            modal.remove();
+            window.location.href = '/login';
+        }, 2000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registrationForm');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
