@@ -1,4 +1,45 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Function to create and show modal
+    function showModal(message, type = 'success') {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
+                <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close modal on click
+        modal.querySelector('.close').addEventListener('click', () => {
+            modal.remove();
+            if (type === 'success') {
+                window.location.href = '/login';
+            }
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                if (type === 'success') {
+                    window.location.href = '/login';
+                }
+            }
+        });
+
+        // Auto-redirect on success after 2 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                modal.remove();
+                window.location.href = '/login';
+            }, 2000);
+        }
+    }
+
     const form = document.getElementById('registrationForm');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
@@ -7,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle password visibility
     togglePasswordIcons.forEach(icon => {
         icon.addEventListener('click', function() {
-            const input = this.previousElementSibling;
+            const input = this.previousElementSibling.querySelector('input');
             const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
             input.setAttribute('type', type);
             this.classList.toggle('fa-eye-slash');
@@ -103,10 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // If form is valid, submit it
         if (isValid) {
-            // Here you would typically send the data to your server
-            alert('Registration successful!');
-            form.reset();
-            document.querySelectorAll('input').forEach(el => el.classList.remove('valid'));
+            signUp();
         }
     });
 
@@ -152,8 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function signUp() {
-    console.log("Ok")
-    var _data = {
+    const _data = {
         full_name: document.getElementById("fullName").value,
         email: document.getElementById("email").value,
         phone_number: document.getElementById("phone").value,
@@ -169,14 +206,16 @@ function signUp() {
     })
     .then(response => {
         if (response.status == 201) {
-            window.open("/login", "_self");
+            showModal("Registration successful!", 'success');
+            document.getElementById('registrationForm').reset();
+            document.querySelectorAll('input').forEach(el => el.classList.remove('valid'));
         } else {
             return response.json().then(err => {
-                alert("Registration failed: " + (err.error || "Unknown error"));
+                showModal("Registration failed: " + (err.error || "Unknown error"), 'error');
             });
         }
     })
     .catch(error => {
-        alert("Something went wrong: " + error.message);
+        showModal("Something went wrong: " + error.message, 'error');
     });
 }

@@ -1,4 +1,45 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Function to create and show modal
+    function showModal(message, type = 'success') {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
+                <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close modal on click
+        modal.querySelector('.close').addEventListener('click', () => {
+            modal.remove();
+            if (type === 'success') {
+                window.location.href = '/home';
+            }
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                if (type === 'success') {
+                    window.location.href = '/home';
+                }
+            }
+        });
+
+        // Auto-redirect on success after 2 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                modal.remove();
+                window.location.href = '/home';
+            }, 2000);
+        }
+    }
+
     const form = document.getElementById('loginForm');
     const passwordInput = document.getElementById('password');
     const togglePasswordIcon = document.querySelector('.toggle-password');
@@ -49,21 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // If form is valid, submit it
         if (isValid) {
-            // Here you would typically send the data to your server
-            // Show loading state
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-            submitBtn.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                alert('Login successful! Redirecting to dashboard...');
-                form.reset();
-                submitBtn.innerHTML = '<span>Login</span><i class="fas fa-arrow-right"></i>';
-                submitBtn.disabled = false;
-                // In a real app, you would redirect here
-                // window.location.href = 'dashboard.html';
-            }, 1500);
+            loginUser();
         }
     });
 
@@ -103,6 +130,10 @@ function loginUser() {
         password: password
     };
 
+    const submitBtn = document.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    submitBtn.disabled = true;
+
     fetch("/login", {
         method: "POST",
         headers: {
@@ -111,17 +142,19 @@ function loginUser() {
         body: JSON.stringify(loginData)
     })
     .then(response => {
+        submitBtn.innerHTML = '<span>Login</span><i class="fas fa-arrow-right"></i>';
+        submitBtn.disabled = false;
         if (response.ok) {
-            // login successful, redirect or show message
-            window.location.href = "/home";
+            showModal('Login successful! Redirecting to dashboard...', 'success');
         } else {
             return response.json().then(data => {
-                alert(data.error || "Login failed");
+                showModal(data.error || "Login failed", 'error');
             });
         }
     })
     .catch(error => {
-        console.error("Login error:", error);
-        alert("An error occurred while logging in.");
+        submitBtn.innerHTML = '<span>Login</span><i class="fas fa-arrow-right"></i>';
+        submitBtn.disabled = false;
+        showModal("An error occurred while logging in: " + error.message, 'error');
     });
 }
