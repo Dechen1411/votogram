@@ -29,15 +29,15 @@ main {
 }
 
 #page-title {
-    font-size: 2.2rem;
+    font-size: 1.4rem;
+    color: rgb(79, 143, 245);
     margin-bottom: 1.5rem;
-    color: #2c3e50;
     text-align: center;
     position: relative;
     padding-bottom: 0.5rem;
 }
 
-#page-title::after {
+/* #page-title::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -47,7 +47,7 @@ main {
     height: 3px;
     background: linear-gradient(90deg, #3498db, #2ecc71);
     border-radius: 3px;
-}
+} */
 
 .poll-info {
     color: #7f8c8d;
