@@ -491,7 +491,7 @@ body.auth-modal-open {
     box-shadow: 0 24px 70px rgba(23, 32, 27, 0.28);
     display: grid;
     grid-template-columns: minmax(240px, 0.72fr) minmax(320px, 1fr);
-    max-height: min(820px, calc(100vh - 36px));
+    max-height: min(760px, calc(100vh - 36px));
     max-width: 940px;
     overflow: hidden;
     position: relative;
@@ -503,9 +503,9 @@ body.auth-modal-open {
     color: #fff;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 22px;
     justify-content: space-between;
-    padding: 28px;
+    padding: 26px;
 }
 
 .auth-modal-side .logo {
@@ -514,7 +514,7 @@ body.auth-modal-open {
 }
 
 .auth-modal-side-copy h2 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     line-height: 1.08;
     margin: 12px 0;
 }
@@ -546,7 +546,7 @@ body.auth-modal-open {
 
 .auth-modal-main {
     overflow-y: auto;
-    padding: 34px;
+    padding: 34px 34px 28px;
 }
 
 .auth-modal-close {
@@ -604,11 +604,11 @@ body.auth-modal-open {
 }
 
 .auth-modal-heading {
-    margin-bottom: 18px;
+    margin-bottom: 12px;
 }
 
 .auth-modal-heading h3 {
-    font-size: 1.65rem;
+    font-size: 1.55rem;
     line-height: 1.1;
     margin: 6px 0 8px;
 }
@@ -619,13 +619,24 @@ body.auth-modal-open {
 
 .auth-modal-form {
     display: grid;
-    gap: 14px;
+    gap: 12px;
+}
+
+.auth-modal-form[data-auth-form="register"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.auth-modal-form[data-auth-form="register"] .auth-modal-heading,
+.auth-modal-form[data-auth-form="register"] .auth-modal-field:last-of-type,
+.auth-modal-form[data-auth-form="register"] .auth-modal-submit,
+.auth-modal-form[data-auth-form="register"] .auth-modal-switch {
+    grid-column: 1 / -1;
 }
 
 .auth-modal-field label {
     display: block;
     font-weight: 800;
-    margin-bottom: 7px;
+    margin-bottom: 6px;
 }
 
 .auth-modal-input {
@@ -646,8 +657,8 @@ body.auth-modal-open {
     border-radius: 8px;
     color: var(--ink);
     font: inherit;
-    min-height: 48px;
-    padding: 12px 44px;
+    min-height: 46px;
+    padding: 11px 44px;
     width: 100%;
 }
 
@@ -690,7 +701,7 @@ body.auth-modal-open {
     display: block;
     font-size: 0.83rem;
     font-weight: 800;
-    min-height: 18px;
+    min-height: 16px;
     padding-top: 3px;
 }
 
@@ -780,6 +791,10 @@ body.auth-modal-open {
     .auth-modal-side {
         display: none;
     }
+
+    .auth-modal-form[data-auth-form="register"] {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 560px) {
@@ -794,5 +809,31 @@ body.auth-modal-open {
 
     .auth-modal-main {
         padding: 28px 18px 22px;
+    }
+}
+
+@media (max-height: 720px) and (min-width: 901px) {
+    .auth-modal-panel {
+        max-height: calc(100vh - 24px);
+    }
+
+    .auth-modal-side {
+        padding: 24px;
+    }
+
+    .auth-modal-mini {
+        display: none;
+    }
+
+    .auth-modal-main {
+        padding: 28px 34px 22px;
+    }
+
+    .auth-modal-tabs {
+        margin-bottom: 16px;
+    }
+
+    .auth-modal-heading p {
+        display: none;
     }
 }
