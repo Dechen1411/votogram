@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votogram - userdashboard</title>
+    <title>Votogram - Poll Workspace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <nav>
                 <a href="/home" class="logo-h">
-                    <i class="fas fa-vote-yea"></i>
+                    <i class="fas fa-check-to-slot"></i>
                     Votogram
                 </a>
                 <div class="auth-links-h">
-                    <a href="/profile" style="color: black;">Profile</a>
-                    <a href="/results" style="color: black;">Results</a>
+                    <a href="/profile">Profile</a>
+                    <a href="/results">Results</a>
                     <a href="/logout" class="btn">Logout</a>
                 </div>
             </nav>
@@ -27,62 +26,106 @@
     </header>
 
     <main class="dashboard-container">
-        <div class="dashboard-nav">
-            <button id="createPollTab" class="active">Create Poll</button>
-            <button id="joinPollTab">Join Poll</button>
+        <section class="workspace-hero">
+            <div>
+                <span class="eyebrow">Poll workspace</span>
+                <h1>Create or join a ballot.</h1>
+                <p>Use poll keys for private access and keep every vote tied to a signed-in voter.</p>
+            </div>
+            <a href="/results" class="btn btn-outline">View Closed Polls</a>
+        </section>
+
+        <div class="dashboard-nav" role="tablist" aria-label="Poll actions">
+            <button id="createPollTab" class="active" type="button">
+                <i class="fas fa-pen-to-square"></i>
+                Create Ballot
+            </button>
+            <button id="joinPollTab" type="button">
+                <i class="fas fa-key"></i>
+                Join With Key
+            </button>
         </div>
 
-        <!-- Create Poll Section -->
         <section id="createPollSection" class="poll-section active">
             <form class="poll-form">
-                <div class="form-group">
-                    <label for="pollTitle">Poll Question</label>
-                    <input type="text" id="pollTitle" placeholder="Enter your poll question" required>
+                <div class="form-heading">
+                    <span class="form-step">1</span>
+                    <div>
+                        <h2>Build the ballot</h2>
+                        <p>Add a clear question and at least two choices.</p>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Poll Options</label>
-                    <div id="pollOptions">
+                    <label for="pollTitle">Ballot Question</label>
+                    <input type="text" id="pollTitle" placeholder="Example: Which project should receive funding?" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Choices</label>
+                    <div id="pollOptions" class="option-stack">
                         <div class="option-input">
-                            <input type="text" placeholder="Option 1" required>
-                            <button type="button" class="remove-option" disabled>×</button>
+                            <span>A</span>
+                            <input type="text" placeholder="Choice A" required>
+                            <button type="button" class="remove-option" disabled aria-label="Remove option">x</button>
                         </div>
                         <div class="option-input">
-                            <input type="text" placeholder="Option 2" required>
-                            <button type="button" class="remove-option" disabled>×</button>
+                            <span>B</span>
+                            <input type="text" placeholder="Choice B" required>
+                            <button type="button" class="remove-option" disabled aria-label="Remove option">x</button>
                         </div>
                     </div>
-                    <button type="button" id="addOption" class="btn-secondary-h">+ Add Option</button>
+                    <button type="button" id="addOption" class="btn-secondary-h">
+                        <i class="fas fa-plus"></i>
+                        Add Choice
+                    </button>
                 </div>
 
                 <div class="form-group">
-                    <label for="pollExpiry">Expiry Date/Time</label>
+                    <label for="pollExpiry">Voting Closes</label>
                     <input type="datetime-local" id="pollExpiry" required>
+                    <p class="hint">Results become available after this time.</p>
                 </div>
 
-                <button type="submit" class="btn-primary-h">Create Poll</button>
-                <div id="pollResult" style="margin-top: 10px; color: green; font-weight: bold; display: none;"></div>
-                <button type="button" id="viewPollsBtn" class="btn-secondary-h" style="margin-top: 1rem;">View Your Polls</button>
+                <button type="submit" class="btn-primary-h">
+                    <i class="fas fa-check-to-slot"></i>
+                    Create Ballot
+                </button>
+                <div id="pollResult" class="poll-result" aria-live="polite"></div>
+                <button type="button" id="viewPollsBtn" class="btn-secondary-h full-width">
+                    <i class="fas fa-list-check"></i>
+                    View My Poll Keys
+                </button>
             </form>
         </section>
 
-        <!-- Join Poll Section -->
         <section id="joinPollSection" class="poll-section">
-            <form class="poll-form">
-                <div class="form-group">
-                    <label for="pollKey">Poll Key</label>
-                    <input type="text" id="pollKey" placeholder="Enter the poll key" required>
-                    <p class="hint">Get the poll key from the poll creator</p>
+            <form class="poll-form join-form">
+                <div class="form-heading">
+                    <span class="form-step">2</span>
+                    <div>
+                        <h2>Enter a poll key</h2>
+                        <p>Poll keys are shared by the ballot creator.</p>
+                    </div>
                 </div>
-                <button type="submit" class="btn-primary-h">Join Poll</button>
+
+                <div class="key-entry">
+                    <label for="pollKey">Poll Key</label>
+                    <input type="text" id="pollKey" placeholder="ABC123" required maxlength="12">
+                    <p class="hint">Keys are short codes like <strong>CL9A2P</strong>.</p>
+                </div>
+                <button type="submit" class="btn-primary-h">
+                    <i class="fas fa-arrow-right-to-bracket"></i>
+                    Open Ballot
+                </button>
             </form>
         </section>
 
-        <!-- Modal for Viewing Polls -->
         <div id="pollsModal" class="modal" style="display: none;">
             <div class="modal-content">
-                <span id="closeModal" class="close">&times;</span>
+                <button id="closeModal" class="close" type="button" aria-label="Close">&times;</button>
                 <h2>Your Created Polls</h2>
+                <p class="modal-subtitle">Share these keys with voters before the close time.</p>
                 <div id="pollsList" class="polls-list"></div>
             </div>
         </div>
@@ -90,49 +133,6 @@
 
     <footer>
         <div class="container">
-            <div class="footer-top">
-                <div class="footer-brand">
-                    <a href="#" class="logo">
-                        <i class="fas fa-vote-yea"></i>
-                        Votogram
-                    </a>
-                    <p>We secure your votes!</p>
-                </div>
-
-                <div class="footer-links">
-                    <div class="links-column">
-                        <h3 class="footer-heading">HELP & INFORMATION</h3>
-                        <ul>
-                            <li><a href="#">Terms & Condition</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">FAQ</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column" style="margin-top: 1.7rem;">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="#">About Us</a></li>
-                            <li><a href="#">Help Center</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column">
-                        <h3 class="footer-heading">QUICK LINKS</h3>
-                        <ul>
-                            <li><a href="#">Home</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="#">Contact Us</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
             <div class="footer-bottom">
                 <p>Gyalpozhing College of Information Technology, Kabesa</p>
             </div>

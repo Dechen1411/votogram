@@ -9,79 +9,36 @@
     <link rel="stylesheet" href="/static/css/results.css">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <nav>
                 <a href="/home" class="logo-h">
-                    <i class="fas fa-vote-yea"></i>
+                    <i class="fas fa-check-to-slot"></i>
                     Votogram
                 </a>
                 <div class="auth-links-h">
-                    <a href="/profile" style="color: black;">Profile</a>
-                    <a href="/results" style="color: black;">Results</a>
+                    <a href="/profile">Profile</a>
+                    <a href="/results">Results</a>
                     <a href="/logout" class="btn">Logout</a>
                 </div>
             </nav>
         </div>
     </header>
 
-    <main>
-        <div class="results">
-            <div class="results-container">
-                <p id="page-title">Poll Results</p>
-                <div id="polls-list"></div>
-                <div id="results-container"></div>
+    <main class="results-page">
+        <section class="results-shell">
+            <div class="results-heading">
+                <span class="eyebrow">Tally board</span>
+                <h1 id="page-title">Poll Results</h1>
+                <p>Closed polls appear here. Open a poll to review its final vote count.</p>
             </div>
-        </div>
+            <div id="polls-list"></div>
+            <div id="results-container"></div>
+        </section>
     </main>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="footer-top">
-                <div class="footer-brand">
-                    <a href="#" class="logo">
-                        <i class="fas fa-vote-yea"></i>
-                        Votogram
-                    </a>
-                    <p>We secure your votes!</p>
-                </div>
-
-                <div class="footer-links">
-                    <div class="links-column">
-                        <h3 class="footer-heading">HELP & INFORMATION</h3>
-                        <ul>
-                            <li><a href="#">Terms & Condition</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">FAQ</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column" style="margin-top: 1.7rem;">
-                        <h3 class="footer-heading"> </h3>
-                        <ul>
-                            <li><a href="#">About Us</a></li>
-                            <li><a href="#">Help Center</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column">
-                        <h3 class="footer-heading">QUICK LINKS</h3>
-                        <ul>
-                            <li><a href="#">Home</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column">
-                        <h3 class="footer-heading"> </h3>
-                        <ul>
-                            <li><a href="#">Contact Us</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
             <div class="footer-bottom">
                 <p>Gyalpozhing College of Information Technology, Kabesa</p>
             </div>
@@ -95,7 +52,6 @@
             const pollsList = document.getElementById('polls-list');
             const resultsContainer = document.getElementById('results-container');
 
-            // Date formatting options for UTC+06:00
             const dateOptions = {
                 year: 'numeric',
                 month: 'long',
@@ -103,25 +59,32 @@
                 hour: 'numeric',
                 minute: '2-digit',
                 hour12: true,
-                timeZone: 'Asia/Dhaka' // UTC+06:00
+                timeZone: 'Asia/Dhaka'
             };
 
-            // Show loading state
-            function showLoading(element) {
-                element.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+            function showLoading(element, message) {
+                element.innerHTML = `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> ${message}</div>`;
             }
 
-            // Hide loading state
-            function hideLoading(element) {
-                const loadingElement = element.querySelector('.loading-spinner');
-                if (loadingElement) {
-                    loadingElement.remove();
-                }
+            function formatDate(value) {
+                return new Date(value + 'Z').toLocaleString('en-US', dateOptions);
+            }
+
+            function pollCard(poll) {
+                const formattedExpiry = formatDate(poll.expires_at);
+                return `
+                    <a href="/results?id=${poll.id}" class="poll-link">
+                        <span>
+                            <strong>${poll.title}</strong>
+                            <small>Closed ${formattedExpiry}</small>
+                        </span>
+                        <i class="fas fa-chart-simple"></i>
+                    </a>
+                `;
             }
 
             if (!pollID) {
-                // No poll ID provided, show list of expired polls
-                showLoading(pollsList);
+                showLoading(pollsList, 'Loading closed polls...');
 
                 try {
                     const response = await fetch('/api/polls/expired', {
@@ -139,56 +102,37 @@
                     }
 
                     const data = await response.json();
-                    console.log('Expired polls response:', data); // Debug response
-
-                    // Ensure created_polls and joined_polls are arrays
-                    const created_polls = Array.isArray(data.created_polls) ? data.created_polls : [];
-                    const joined_polls = Array.isArray(data.joined_polls) ? data.joined_polls : [];
+                    const createdPolls = Array.isArray(data.created_polls) ? data.created_polls : [];
+                    const joinedPolls = Array.isArray(data.joined_polls) ? data.joined_polls : [];
 
                     pollsList.innerHTML = '';
 
-                    // Display created polls
-                    if (created_polls.length > 0) {
-                        pollsList.innerHTML += '<h2>Polls You Created</h2>';
-                        const createdUl = document.createElement('ul');
-                        createdUl.className = 'poll-list';
-                        created_polls.forEach(poll => {
-                            const expiryDate = new Date(poll.expires_at + 'Z'); // Treat as UTC
-                            const formattedExpiry = expiryDate.toLocaleString('en-US', dateOptions);
-                            const li = document.createElement('li');
-                            li.innerHTML = `<a href="/results?id=${poll.id}" class="poll-link">${poll.title} (Expired: ${formattedExpiry})</a>`;
-                            createdUl.appendChild(li);
-                        });
-                        pollsList.appendChild(createdUl);
+                    if (createdPolls.length > 0) {
+                        pollsList.innerHTML += `
+                            <section class="poll-group">
+                                <h2>Polls You Created</h2>
+                                <div class="poll-list">${createdPolls.map(pollCard).join('')}</div>
+                            </section>
+                        `;
                     }
 
-                    // Display joined polls
-                    if (joined_polls.length > 0) {
-                        pollsList.innerHTML += '<h2>Polls You Joined</h2>';
-                        const joinedUl = document.createElement('ul');
-                        joinedUl.className = 'poll-list';
-                        joined_polls.forEach(poll => {
-                            const expiryDate = new Date(poll.expires_at + 'Z'); // Treat as UTC
-                            const formattedExpiry = expiryDate.toLocaleString('en-US', dateOptions);
-                            const li = document.createElement('li');
-                            li.innerHTML = `<a href="/results?id=${poll.id}" class="poll-link">${poll.title} (Expired: ${formattedExpiry})</a>`;
-                            joinedUl.appendChild(li);  // Fixed: Appending to joinedUl instead of createdUl
-                        });
-                        pollsList.appendChild(joinedUl);
+                    if (joinedPolls.length > 0) {
+                        pollsList.innerHTML += `
+                            <section class="poll-group">
+                                <h2>Polls You Joined</h2>
+                                <div class="poll-list">${joinedPolls.map(pollCard).join('')}</div>
+                            </section>
+                        `;
                     }
 
-                    if (created_polls.length === 0 && joined_polls.length === 0) {
-                        pollsList.innerHTML = '<p class="info-message">No expired polls available.</p>';
+                    if (createdPolls.length === 0 && joinedPolls.length === 0) {
+                        pollsList.innerHTML = '<p class="info-message">No closed polls yet.</p>';
                     }
                 } catch (error) {
-                    console.error('Error fetching expired polls:', error);
                     pollsList.innerHTML = `<p class="error-message">Failed to load polls: ${error.message || 'Unknown error'}</p>`;
-                } finally {
-                    hideLoading(pollsList);
                 }
             } else {
-                // Poll ID provided, show results
-                showLoading(resultsContainer);
+                showLoading(resultsContainer, 'Loading tally...');
 
                 try {
                     const response = await fetch(`/api/polls/${pollID}/results`, {
@@ -206,22 +150,20 @@
                     }
 
                     const data = await response.json();
-                    console.log('Poll results response:', data); // Debug response
-
-                    // Update page title and info
                     document.getElementById('page-title').textContent = data.title || 'Poll Results';
-                    const expiryDate = new Date(data.expires_at + 'Z'); // Treat as UTC
-                    const formattedExpiry = expiryDate.toLocaleString('en-US', dateOptions);
-                    pollsList.innerHTML = `<p class="poll-info">Expired on ${formattedExpiry} | Total Votes: ${data.total_votes || 0}</p>`;
+                    pollsList.innerHTML = `
+                        <div class="poll-info">
+                            <span><i class="fas fa-lock"></i> Closed ${formatDate(data.expires_at)}</span>
+                            <span><i class="fas fa-users"></i> ${data.total_votes || 0} total votes</span>
+                        </div>
+                    `;
 
-                    // Clear previous results
                     resultsContainer.innerHTML = '';
 
-                    // Display results
                     if (!data.results || data.results.length === 0) {
                         resultsContainer.innerHTML = '<p class="info-message">No votes recorded for this poll.</p>';
                     } else {
-                        data.results.forEach(result => {
+                        data.results.forEach((result, index) => {
                             const percentage = data.total_votes > 0
                                 ? ((result.vote_count / data.total_votes) * 100).toFixed(1)
                                 : 0;
@@ -229,7 +171,13 @@
                             const resultItem = document.createElement('div');
                             resultItem.className = 'result-item';
                             resultItem.innerHTML = `
-                                <p>${result.text || 'Option'}: ${result.vote_count} votes (${percentage}%)</p>
+                                <div class="result-row">
+                                    <span class="result-rank">${index + 1}</span>
+                                    <div>
+                                        <strong>${result.text || 'Option'}</strong>
+                                        <small>${result.vote_count} votes (${percentage}%)</small>
+                                    </div>
+                                </div>
                                 <div class="result-bar">
                                     <div class="result-fill" style="width: ${percentage}%"></div>
                                 </div>
@@ -238,10 +186,7 @@
                         });
                     }
                 } catch (error) {
-                    console.error('Error fetching poll results:', error);
                     resultsContainer.innerHTML = `<p class="error-message">Failed to load results: ${error.message || 'Unknown error'}</p>`;
-                } finally {
-                    hideLoading(resultsContainer);
                 }
             }
         });

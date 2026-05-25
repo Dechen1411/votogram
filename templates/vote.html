@@ -3,107 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votogram - userdashoard</title>
+    <title>Votogram - Cast Ballot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/vote.css">
-    <style>
-        
-    </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <nav>
                 <a href="/home" class="logo-h">
-                    <i class="fas fa-vote-yea"></i>
+                    <i class="fas fa-check-to-slot"></i>
                     Votogram
                 </a>
                 <div class="auth-links-h">
-                    <a href="/profile" style="color: black;">Profile</a>
-                    <a href="/results" style="color: black;">Results</a>
+                    <a href="/profile">Profile</a>
+                    <a href="/results">Results</a>
                     <a href="/logout" class="btn">Logout</a>
-                </div>                
+                </div>
             </nav>
         </div>
     </header>
 
-    <main class="voting-container">
-        <div class="voting-header">
-          <p id="poll-title" class="poll-title">Loading...</p>
-          <p id="poll-expiry" class="poll-description"></p>
-        </div>
-    
-        <div class="voting-alert">
-          <i class="fas fa-info-circle"></i>
-          <p>Please select your preferred option below. You can only vote once.</p>
-        </div>
-    
-        <form id="voting-form" class="voting-options">
-          <div id="options-container"></div>
-    
-          <div class="voting-actions">
-            <button type="button" class="btn btn-secondary" onclick="history.back()">
-              <i class="fas fa-arrow-left"></i> Back
-            </button>
-            <button type="submit" class="btn btn-primary">
-              Submit Vote <i class="fas fa-check-circle"></i>
-            </button>
-          </div>
-        </form>
-      </main>
+    <main class="voting-page">
+        <section class="ballot-shell">
+            <div class="ballot-meta">
+                <span class="eyebrow">Official ballot</span>
+                <span id="poll-expiry" class="poll-description">Loading close time...</span>
+            </div>
 
-<footer>
-    <div class="container">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <a href="#" class="logo">
-                    <i class="fas fa-vote-yea"></i>
-                    Votogram
-                </a>
-                <p>We secure your votes!</p>
+            <div class="voting-header">
+                <h1 id="poll-title" class="poll-title">Loading ballot...</h1>
+                <p>Choose one option. Your ballot can only be submitted once.</p>
             </div>
-                
-            <div class="footer-links">
-                <div class="links-column">
-                    <h3 class="footer-heading">HELP & INFORMATION</h3>
-                    <ul>
-                        <li><a href="#">Terms & Condition</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
+
+            <div class="voting-alert">
+                <i class="fas fa-circle-info"></i>
+                <p>Review your selection before submitting. After your vote is recorded, you will return to the poll workspace.</p>
+            </div>
+
+            <form id="voting-form" class="voting-options">
+                <div id="options-container"></div>
+
+                <div class="voting-actions">
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check-circle"></i>
+                        Cast Vote
+                    </button>
                 </div>
-                    
-                <div class="links-column" style="margin-top: 1.7rem;">
-                    <h3 class="footer-heading">&nbsp;</h3>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Help Center</a></li>
-                    </ul>
-                </div>
-                    
-                <div class="links-column">
-                    <h3 class="footer-heading">QUICK LINKS</h3>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                    </ul>
-                </div>
-                    
-                <div class="links-column">
-                    <h3 class="footer-heading">&nbsp;</h3>
-                    <ul>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>Gyalpozhing College of Information Technology, Kabesa</p>
             </div>
         </div>
-            
-        <div class="footer-bottom">
-            <p>Gyalpozhing College of Information Technology, Kabesa</p>
-        </div>
-    </div>
-</footer>
+    </footer>
+
+    <script src="/static/js/vote.js"></script>
 </body>
-<script src="/static/js/vote.js"></script>
 </html>

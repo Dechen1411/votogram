@@ -1,36 +1,47 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Function to create and show modal
     function showModal(message, type = 'success') {
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
         modal.innerHTML = `
             <div class="modal-content">
-                <span class="close">×</span>
-                <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
+                <button class="close" type="button" aria-label="Close">&times;</button>
+                <h2>${type === 'success' ? 'Success' : 'Needs Attention'}</h2>
                 <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
             </div>
         `;
         document.body.appendChild(modal);
 
-        // Close modal on click
-        modal.querySelector('.close').addEventListener('click', () => {
-            modal.remove();
-        });
-
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+        modal.querySelector('.close').addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
                 modal.remove();
             }
         });
     }
 
-    // Tab switching
+    function optionLetter(index) {
+        return String.fromCharCode(65 + index);
+    }
+
+    function renumberOptions() {
+        pollOptions.querySelectorAll('.option-input').forEach((option, index) => {
+            option.querySelector('span').textContent = optionLetter(index);
+            option.querySelector('input').placeholder = `Choice ${optionLetter(index)}`;
+        });
+
+        const canRemove = pollOptions.children.length > 2;
+        pollOptions.querySelectorAll('.remove-option').forEach(button => {
+            button.disabled = !canRemove;
+        });
+    }
+
     const createPollTab = document.getElementById('createPollTab');
     const joinPollTab = document.getElementById('joinPollTab');
     const createPollSection = document.getElementById('createPollSection');
     const joinPollSection = document.getElementById('joinPollSection');
+    const pollOptions = document.getElementById('pollOptions');
+    const addOptionBtn = document.getElementById('addOption');
 
     createPollTab.addEventListener('click', function () {
         createPollTab.classList.add('active');
@@ -46,188 +57,176 @@ document.addEventListener('DOMContentLoaded', function () {
         createPollSection.classList.remove('active');
     });
 
-    // Dynamic poll options
-    const pollOptions = document.getElementById('pollOptions');
-    const addOptionBtn = document.getElementById('addOption');
-    let optionCount = 2;
-
     addOptionBtn.addEventListener('click', function () {
-        optionCount++;
         const optionDiv = document.createElement('div');
         optionDiv.className = 'option-input';
         optionDiv.innerHTML = `
-            <input type="text" placeholder="Option ${optionCount}" required>
-            <button type="button" class="remove-option">×</button>
+            <span></span>
+            <input type="text" required>
+            <button type="button" class="remove-option" aria-label="Remove option">x</button>
         `;
         pollOptions.appendChild(optionDiv);
+        renumberOptions();
+    });
 
-        if (optionCount > 2) {
-            document.querySelectorAll('.remove-option').forEach(btn => btn.disabled = false);
+    pollOptions.addEventListener('click', function (event) {
+        if (!event.target.classList.contains('remove-option')) {
+            return;
+        }
+
+        if (pollOptions.children.length > 2) {
+            event.target.parentElement.remove();
+            renumberOptions();
         }
     });
 
-    // Remove option
-    pollOptions.addEventListener('click', function (e) {
-        if (e.target.classList.contains('remove-option')) {
-            if (pollOptions.children.length > 2) {
-                e.target.parentElement.remove();
-                optionCount--;
+    document.querySelector('#createPollSection form').addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-                if (optionCount === 2) {
-                    document.querySelectorAll('.remove-option').forEach(btn => {
-                        btn.disabled = true;
-                    });
-                }
-            }
-        }
-    });
-
-    // CREATE POLL submission
-    document.querySelector('#createPollSection form').addEventListener('submit', async function (e) {
-        e.preventDefault();
         const titleInput = document.getElementById('pollTitle');
         const expiryInput = document.getElementById('pollExpiry');
         const optionsInputs = pollOptions.querySelectorAll('input');
-
         const title = titleInput.value.trim();
-        const options = Array.from(optionsInputs).map(input => input.value.trim()).filter(opt => opt);
-
-        // Convert expiry to UTC
-        const localExpiry = new Date(expiryInput.value);
-        const now = new Date();
-        if (localExpiry <= now) {
-            showModal('Expiry time must be in the future.', 'error');
-            return;
-        }
-        const utcExpiry = localExpiry.toISOString().slice(0, 16); // Format: 2006-01-02T15:04
+        const options = Array.from(optionsInputs).map(input => input.value.trim()).filter(Boolean);
 
         if (title === '' || options.length < 2 || !expiryInput.value) {
-            showModal('Please fill all fields with at least 2 options.', 'error');
+            showModal('Add a question, close time, and at least two choices.', 'error');
             return;
         }
 
+        const localExpiry = new Date(expiryInput.value);
+        if (localExpiry <= new Date()) {
+            showModal('Choose a close time in the future.', 'error');
+            return;
+        }
+
+        const utcExpiry = localExpiry.toISOString().slice(0, 16);
+
         try {
-            const res = await fetch('/api/polls', {
+            const response = await fetch('/api/polls', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title, options, expiry: utcExpiry })
             });
 
-            if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(errText || 'Failed to create poll');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to create ballot');
             }
 
-            const data = await res.json();
-
-            // Display the poll key on the page
+            const data = await response.json();
             const resultDiv = document.getElementById('pollResult');
-            resultDiv.textContent = `Poll created successfully! Your poll key is: ${data.poll_key}`;
+            resultDiv.innerHTML = `
+                <div class="poll-result-card">
+                    <p>Ballot created. Share this poll key with voters:</p>
+                    <div class="poll-key">
+                        <span>${data.poll_key}</span>
+                        <button type="button" class="copy-key" data-key="${data.poll_key}">Copy</button>
+                    </div>
+                </div>
+            `;
             resultDiv.style.display = 'block';
 
-            // Reset form fields
             titleInput.value = '';
             expiryInput.value = '';
-
-            // Keep only 2 option inputs
             while (pollOptions.children.length > 2) {
-                pollOptions.lastChild.remove();
+                pollOptions.lastElementChild.remove();
             }
-
-            // Reset the first two option inputs
-            pollOptions.querySelectorAll('input').forEach((input, idx) => {
+            pollOptions.querySelectorAll('input').forEach(input => {
                 input.value = '';
-                input.placeholder = `Option ${idx + 1}`;
             });
-
-            // Disable remove buttons if only 2 options
-            document.querySelectorAll('.remove-option').forEach(btn => btn.disabled = true);
-
-            showModal(`Poll created successfully! Your poll key is: ${data.poll_key}`, 'success');
-
-        } catch (err) {
-            showModal('Error: ' + err.message, 'error');
+            renumberOptions();
+            showModal(`Ballot created. Poll key: ${data.poll_key}`, 'success');
+        } catch (error) {
+            showModal(error.message, 'error');
         }
     });
 
-    // JOIN POLL submission
-    document.querySelector('#joinPollSection form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const pollKey = document.getElementById('pollKey').value.trim();
+    document.addEventListener('click', async function (event) {
+        if (!event.target.classList.contains('copy-key')) {
+            return;
+        }
+
+        const key = event.target.dataset.key;
+        try {
+            await navigator.clipboard.writeText(key);
+            event.target.textContent = 'Copied';
+        } catch {
+            event.target.textContent = 'Select Key';
+        }
+    });
+
+    document.querySelector('#joinPollSection form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const pollKeyInput = document.getElementById('pollKey');
+        const pollKey = pollKeyInput.value.trim().toUpperCase();
         if (!pollKey) {
-            showModal('Please enter a valid poll key.', 'error');
+            showModal('Enter the poll key from the ballot creator.', 'error');
             return;
         }
 
         try {
-            const res = await fetch('/api/polls/join', {
+            const response = await fetch('/api/polls/join', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ poll_key: pollKey })
             });
 
-            if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(errText || 'Invalid poll key or expired poll.');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Invalid or expired poll key.');
             }
 
-            const data = await res.json();
-            const pollID = data.poll_id;
-            
-            // Redirect to voting page with poll ID
-            window.location.href = `/vote?id=${pollID}`;
-
-        } catch (err) {
-            showModal('Error: ' + err.message, 'error');
+            const data = await response.json();
+            window.location.href = `/vote?id=${data.poll_id}`;
+        } catch (error) {
+            showModal(error.message, 'error');
         }
     });
 
-    // View Polls Modal
     const viewPollsBtn = document.getElementById('viewPollsBtn');
     const pollsModal = document.getElementById('pollsModal');
     const closeModal = document.getElementById('closeModal');
     const pollsList = document.getElementById('pollsList');
 
     viewPollsBtn.addEventListener('click', async function () {
-        pollsList.innerHTML = '<div class="loading-input"></div>'; // Show loading state
+        pollsList.innerHTML = '<div class="loading-input"></div>';
         pollsModal.style.display = 'flex';
 
         try {
-            const res = await fetch('/api/polls/user', {
+            const response = await fetch('/api/polls/user', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include' // Ensure session cookie is sent
+                credentials: 'include'
             });
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${res.status}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP ${response.status}`);
             }
 
-            const data = await res.json();
-            const polls = Array.isArray(data) ? data : [];
-            console.log('User polls response:', polls); // Debug response
-            pollsList.innerHTML = ''; // Clear loading state
+            const polls = await response.json();
+            const pollItems = Array.isArray(polls) ? polls : [];
+            pollsList.innerHTML = '';
 
-            if (polls.length === 0) {
-                pollsList.innerHTML = '<p class="info-message">No polls created yet.</p>';
+            if (pollItems.length === 0) {
+                pollsList.innerHTML = '<p class="info-message">No created polls yet.</p>';
                 return;
             }
 
-            polls.forEach(poll => {
+            pollItems.forEach(poll => {
                 const pollItem = document.createElement('div');
                 pollItem.className = 'poll-item';
                 pollItem.innerHTML = `
                     <h3>${poll.title}</h3>
-                    <p>Poll Key: ${poll.poll_key}</p>
+                    <p>Poll key: <strong>${poll.poll_key}</strong></p>
+                    <p>Closes: ${poll.expiry}</p>
                 `;
                 pollsList.appendChild(pollItem);
             });
-        } catch (err) {
-            console.error('Error fetching user polls:', err);
-            pollsList.innerHTML = `<p class="error-message">Failed to fetch polls: ${err.message}</p>`;
+        } catch (error) {
+            pollsList.innerHTML = `<p class="error-message">Failed to fetch polls: ${error.message}</p>`;
         }
     });
 
@@ -235,10 +234,11 @@ document.addEventListener('DOMContentLoaded', function () {
         pollsModal.style.display = 'none';
     });
 
-    // Close modal when clicking outside
-    window.addEventListener('click', function (e) {
-        if (e.target === pollsModal) {
+    window.addEventListener('click', function (event) {
+        if (event.target === pollsModal) {
             pollsModal.style.display = 'none';
         }
     });
+
+    renumberOptions();
 });
