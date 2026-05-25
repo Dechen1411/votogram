@@ -3,69 +3,67 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/url"
 	"os"
+	"strings"
 
-	_ "github.com/lib/pq" // PostgreSQL driver
+	_ "github.com/lib/pq"
 )
 
 var Db *sql.DB
 
 func init() {
-	// Get DB credentials from environment variables
+	dbInfo, source := connectionString()
+
+	var err error
+	Db, err = sql.Open("postgres", dbInfo)
+	if err != nil {
+		log.Fatalf("failed to open database connection: %v", err)
+	}
+
+	log.Printf("database connection configured from %s", source)
+}
+
+func connectionString() (string, string) {
+	if databaseURL := os.Getenv("DATABASE_URL"); databaseURL != "" {
+		return withSSLMode(databaseURL, os.Getenv("POSTGRES_SSLMODE")), "DATABASE_URL"
+	}
+
 	host := os.Getenv("POSTGRES_HOST")
 	port := os.Getenv("POSTGRES_PORT")
+	if port == "" {
+		port = "5432"
+	}
 	user := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DBNAME")
-
-	// Build connection string
-	db_info := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require",
-		host, port, user, password, dbname)
-	fmt.Println("Connecting to DB with:", db_info)
-
-	var err error
-	Db, err = sql.Open("postgres", db_info)
-	if err != nil {
-		panic(err)
+	sslmode := os.Getenv("POSTGRES_SSLMODE")
+	if sslmode == "" {
+		sslmode = "require"
+		if host == "localhost" || host == "127.0.0.1" {
+			sslmode = "disable"
+		}
 	}
-	fmt.Println("Database successfully connected")
+
+	dbInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, sslmode)
+
+	return dbInfo, "POSTGRES_*"
 }
 
-// package postgres
+func withSSLMode(databaseURL string, sslmode string) string {
+	if sslmode == "" || strings.Contains(databaseURL, "sslmode=") {
+		return databaseURL
+	}
 
-// import (
-// 	"database/sql"
-// 	"fmt"
-// 	"log"
+	parsedURL, err := url.Parse(databaseURL)
+	if err != nil {
+		return databaseURL
+	}
 
-// 	_ "github.com/lib/pq"
-// )
-
-// const (
-// 	postgres_host     = "dpg-d0l2rabuibrs739vs7t0-a.singapore-postgres.render.com"
-// 	postgres_port     = 5432
-// 	postgres_user     = "postgres_admin"
-// 	postgres_password = "0qufCFKJ6XpjDqlykrcJU5UU214b21Ww"
-// 	postgres_dbname   = "gyalkhor"
-// )
-
-// var Db *sql.DB
-
-// func init() {
-// 	dbInfo := fmt.Sprintf(
-// 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
-// 		postgres_host, postgres_port, postgres_user, postgres_password, postgres_dbname,
-// 	)
-
-// 	var err error
-// 	Db, err = sql.Open("postgres", dbInfo)
-// 	if err != nil {
-// 		log.Fatalf("Failed to open database connection: %v", err)
-// 	}
-
-// 	if err = Db.Ping(); err != nil {
-// 		log.Fatalf("Failed to ping database: %v", err)
-// 	}
-
-// 	log.Println("✅ Successfully connected to the gyalkhor database")
-// }
+	query := parsedURL.Query()
+	query.Set("sslmode", sslmode)
+	parsedURL.RawQuery = query.Encode()
+	return parsedURL.String()
+}

@@ -1,16 +1,42 @@
-CREATE TABLE polls (
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(100),
+    phone_number VARCHAR(20),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    avatar_path VARCHAR(255),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Polls table: Stores poll details
+CREATE TABLE IF NOT EXISTS polls (
     id SERIAL PRIMARY KEY,
     creator_email VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    poll_key VARCHAR(10) UNIQUE NOT NULL DEFAULT '',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    poll_key VARCHAR(6) NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_email) REFERENCES users(email) ON DELETE CASCADE
 );
 
-CREATE TABLE poll_options (
+-- Poll_options table: Stores options for each poll
+CREATE TABLE IF NOT EXISTS poll_options (
     id SERIAL PRIMARY KEY,
-    poll_id INTEGER REFERENCES polls(id) ON DELETE CASCADE,
-    option_text TEXT NOT NULL
+    poll_id INTEGER NOT NULL,
+    option_text VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE
 );
-ALTER TABLE users ADD COLUMN avatar_path TEXT DEFAULT '';
+
+-- Votes table: Stores user votes
+CREATE TABLE IF NOT EXISTS votes (
+    id SERIAL PRIMARY KEY,
+    poll_id INTEGER NOT NULL,
+    option_id INTEGER NOT NULL,
+    voter_email VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+    FOREIGN KEY (option_id) REFERENCES poll_options(id) ON DELETE CASCADE,
+    FOREIGN KEY (voter_email) REFERENCES users(email) ON DELETE CASCADE,
+    UNIQUE (poll_id, voter_email) -- Ensures one vote per user per poll
+);

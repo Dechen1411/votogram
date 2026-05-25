@@ -1,93 +1,117 @@
 # Votogram
 
+Votogram is a Go web app for creating polls, sharing poll keys, voting, and viewing results after a poll expires. It uses Gorilla Mux for routing, Gorilla Sessions for cookie sessions, PostgreSQL for persistence, and server-rendered HTML templates with static CSS/JS assets.
 
+## Requirements
 
-## Getting started
+- Go 1.23 or newer
+- PostgreSQL database
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Configuration
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Set these environment variables before starting the server:
 
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+```powershell
+$env:DATABASE_URL="postgresql://postgres:your-password@localhost:5432/votogram"
+$env:POSTGRES_HOST="localhost"
+$env:POSTGRES_PORT="5432"
+$env:POSTGRES_USER="postgres"
+$env:POSTGRES_PASSWORD="your-password"
+$env:POSTGRES_DBNAME="votogram"
+$env:POSTGRES_SSLMODE="disable"
+$env:SESSION_SECRET="replace-with-a-long-random-secret"
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/team-sangay/votogram.git
-git branch -M main
-git push -uf origin main
+
+Optional:
+
+```powershell
+$env:PORT="8080"
 ```
 
-## Integrate with your tools
+`DATABASE_URL` is preferred when available. The separate `POSTGRES_*` values are still supported for local setup.
 
-- [ ] [Set up project integrations](https://gitlab.com/team-sangay/votogram/-/settings/integrations)
+`SESSION_SECRET` should be a long random value in production. If it is missing, the app uses a development-only fallback and logs a warning.
 
-## Collaborate with your team
+Use `POSTGRES_SSLMODE="disable"` for a local PostgreSQL server. Hosted databases usually use `require`.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+## Database
 
-## Test and Deploy
+Create the database tables with:
 
-Use the built-in continuous integration in GitLab.
+```powershell
+go run . migrate
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Run
 
-***
+```powershell
+go mod download
+go run .
+```
 
-# Editing this README
+Then open:
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```text
+http://localhost:8080
+```
 
-## Suggestions for a good README
+Use the configured `PORT` value if you changed it.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## Deploy To Render
 
-## Name
-Choose a self-explaining name for your project.
+This repo includes `render.yaml`, which defines:
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+- A native Go web service
+- A managed Render Postgres database
+- A generated `SESSION_SECRET`
+- A pre-deploy migration command: `./votogram migrate`
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Deploy flow:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+1. Commit and push this repo to GitLab/GitHub.
+2. In Render, click **New > Blueprint**.
+3. Connect the repo and choose the branch.
+4. Render reads `render.yaml`, provisions the web service and database, then runs the migration.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+The app will be available at the service's `onrender.com` URL after deploy.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## Deploy To Vercel
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+This repo includes `api/index.go` and `vercel.json` so Vercel builds the app as a Go function.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+```powershell
+vercel deploy --prod --yes
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+For production, add these environment variables in the Vercel project settings:
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+- `POSTGRES_HOST`
+- `POSTGRES_PORT`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_DBNAME`
+- `POSTGRES_SSLMODE`
+- `SESSION_SECRET`
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+The database must be hosted somewhere public, such as Neon, Supabase, Railway, Render, or Vercel Postgres. A local PostgreSQL database on `localhost` will not be reachable from Vercel.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Development Checks
 
-## License
-For open source projects, say how it is licensed.
+```powershell
+gofmt -w .
+go test ./...
+go vet ./...
+git diff --check
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Project Structure
+
+- `main.go`: server entrypoint
+- `routes/`: HTTP route registration
+- `controller/`: page and API handlers
+- `model/`: database-backed domain models
+- `datastore/postgres/`: PostgreSQL connection setup
+- `session/`: cookie session store
+- `templates/`: HTML templates
+- `static/`: CSS, JavaScript, and runtime-uploaded assets
+- `database-q/query.txt`: schema SQL

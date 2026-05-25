@@ -7,10 +7,10 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"text/template"
 	"time"
 	"votogram/datastore/postgres"
 	"votogram/session"
+	"votogram/web"
 
 	"github.com/gorilla/mux"
 )
@@ -98,7 +98,10 @@ func CreatePollHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		http.Error(w, "Failed to save poll", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"poll_key": pollKey})
 }
@@ -183,13 +186,17 @@ func VoteHandler(w http.ResponseWriter, r *http.Request) {
 		PollID:    pollID,
 	}
 
-	tmpl, err := template.ParseFiles("templates/vote.html")
+	tmpl, err := web.ParseTemplate("vote.html")
 	if err != nil {
-		log.Fatal("Error parsing template: ", err)
+		log.Printf("Error parsing vote template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	err = tmpl.Execute(w, data)
 	if err != nil {
-		log.Fatal("Error executing template: ", err)
+		log.Printf("Error executing vote template: %v", err)
+		http.Error(w, "Failed to render template", http.StatusInternalServerError)
+		return
 	}
 }
 

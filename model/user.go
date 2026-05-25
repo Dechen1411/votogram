@@ -1,103 +1,279 @@
 package model
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
-	"fmt"
+	"strconv"
 	"strings"
+	"time"
 	"votogram/datastore/postgres"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-type User struct {
-	FullName    string `json:"full_name"`
-	PhoneNumber string `json:"phone_number"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
-	AvatarPath  string `json:"avatar_path"`
+type Poll struct {
+	ID        int       `json:"id"`
+	Creator   string    `json:"creator_email"`
+	Title     string    `json:"title"`
+	ExpiresAt time.Time `json:"expires_at"`
+	PollKey   string    `json:"poll_key"`
+	Options   []Option  `json:"options"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
-const (
-	queryInsertUser      = "INSERT INTO users (full_name, phone_number, email, password, avatar_path) VALUES ($1, $2, $3, $4, $5)"
-	queryFindUserByEmail = "SELECT full_name, phone_number, email, password, avatar_path FROM users WHERE email=$1"
-)
+type Option struct {
+	ID        int    `json:"id"`
+	PollID    int    `json:"poll_id"`
+	Text      string `json:"text"`
+	VoteCount int    `json:"vote_count,omitempty"`
+}
 
-// Create hashes password and inserts a new user
-func (u *User) Create() error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+type Vote struct {
+	PollID     int       `json:"poll_id"`
+	OptionID   int       `json:"option_id"`
+	VoterEmail string    `json:"voter_email"`
+	VotedAt    time.Time `json:"voted_at"`
+}
+
+func GetPollByID(pollID string) (*Poll, error) {
+	id, err := strconv.Atoi(pollID)
+	if err != nil {
+		return nil, errors.New("invalid poll ID format")
+	}
+
+	var poll Poll
+	err = postgres.Db.QueryRow(`
+        SELECT id, creator_email, title, expires_at
+        FROM polls WHERE id = $1`, id).Scan(
+		&poll.ID, &poll.Creator, &poll.Title, &poll.ExpiresAt)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := postgres.Db.Query(`
+        SELECT id, option_text
+        FROM poll_options
+        WHERE poll_id = $1`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var opt Option
+		if err := rows.Scan(&opt.ID, &opt.Text); err != nil {
+			return nil, err
+		}
+		poll.Options = append(poll.Options, opt)
+	}
+
+	return &poll, nil
+}
+
+func GeneratePollKey() (string, error) {
+	b := make([]byte, 4)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	key := base64.URLEncoding.EncodeToString(b)
+	return strings.ToUpper(strings.TrimRight(key, "=")), nil
+}
+
+func (p *Poll) Create() error {
+	tx, err := postgres.Db.Begin()
 	if err != nil {
 		return err
 	}
-	_, err = postgres.Db.Exec(queryInsertUser, u.FullName, u.PhoneNumber, u.Email, string(hashedPassword), u.AvatarPath)
+
+	// Generate unique poll key
+	var pollKey string
+	for {
+		pollKey, err = GeneratePollKey()
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		var exists bool
+		err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM polls WHERE poll_key = $1)`, pollKey).Scan(&exists)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		if !exists {
+			break
+		}
+	}
+
+	err = tx.QueryRow(
+		`INSERT INTO polls (creator_email, title, expires_at, poll_key)
+		VALUES ($1, $2, $3, $4) RETURNING id, created_at`,
+		p.Creator, p.Title, p.ExpiresAt, pollKey,
+	).Scan(&p.ID, &p.CreatedAt)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	for _, opt := range p.Options {
+		_, err := tx.Exec(
+			`INSERT INTO poll_options (poll_id, option_text)
+			VALUES ($1, $2)`,
+			p.ID, opt.Text,
+		)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
+func GetPollByKey(pollKey string) (*Poll, error) {
+	var poll Poll
+	err := postgres.Db.QueryRow(`
+		SELECT id, creator_email, title, expires_at, poll_key
+		FROM polls WHERE poll_key = $1 AND expires_at > NOW()`,
+		pollKey,
+	).Scan(&poll.ID, &poll.Creator, &poll.Title, &poll.ExpiresAt, &poll.PollKey)
+	if err != nil {
+		return nil, err
+	}
+	return &poll, nil
+}
+
+func GetPollDetails(pollID int) (*Poll, error) {
+	var poll Poll
+	err := postgres.Db.QueryRow(`
+		SELECT id, creator_email, title, expires_at
+		FROM polls WHERE id = $1`,
+		pollID,
+	).Scan(&poll.ID, &poll.Creator, &poll.Title, &poll.ExpiresAt)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := postgres.Db.Query(`
+		SELECT id, option_text
+		FROM poll_options
+		WHERE poll_id = $1`, pollID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var opt Option
+		if err := rows.Scan(&opt.ID, &opt.Text); err != nil {
+			return nil, err
+		}
+		poll.Options = append(poll.Options, opt)
+	}
+
+	return &poll, nil
+}
+
+func RecordVote(vote *Vote) error {
+	// Check if user is the poll creator
+	var creatorEmail string
+	err := postgres.Db.QueryRow(
+		`SELECT creator_email FROM polls WHERE id = $1`,
+		vote.PollID,
+	).Scan(&creatorEmail)
+	if err != nil {
+		return err
+	}
+	if creatorEmail == vote.VoterEmail {
+		return errors.New("poll creators cannot vote in their own polls")
+	}
+
+	// Check if already voted
+	var alreadyVoted bool
+	err = postgres.Db.QueryRow(`
+		SELECT EXISTS(
+			SELECT 1 FROM votes
+			WHERE poll_id = $1 AND voter_email = $2
+		)`, vote.PollID, vote.VoterEmail).Scan(&alreadyVoted)
+	if err != nil {
+		return err
+	}
+	if alreadyVoted {
+		return errors.New("already voted in this poll")
+	}
+
+	// Check valid option
+	var validOption bool
+	err = postgres.Db.QueryRow(`
+		SELECT EXISTS(
+			SELECT 1 FROM poll_options
+			WHERE id = $1 AND poll_id = $2
+		)`, vote.OptionID, vote.PollID).Scan(&validOption)
+	if err != nil || !validOption {
+		return errors.New("invalid option for this poll")
+	}
+
+	_, err = postgres.Db.Exec(`
+		INSERT INTO votes (poll_id, option_id, voter_email)
+		VALUES ($1, $2, $3)`, vote.PollID, vote.OptionID, vote.VoterEmail)
 	return err
 }
 
-// FindByEmail looks up a user by email, filling the struct fields
-func (u *User) FindByEmail(email string) error {
-	err := postgres.Db.QueryRow(queryFindUserByEmail, email).
-		Scan(&u.FullName, &u.PhoneNumber, &u.Email, &u.Password, &u.AvatarPath)
+func GetPollResults(pollID string) (*Poll, error) {
+	id, err := strconv.Atoi(pollID)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			return errors.New("user not found")
-		}
-		return err
+		return nil, errors.New("invalid poll ID format")
 	}
-	return nil
+
+	poll, err := GetPollByID(pollID)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := postgres.Db.Query(`
+        SELECT po.id, po.option_text, COUNT(v.option_id) as vote_count
+        FROM poll_options po
+        LEFT JOIN votes v ON po.id = v.option_id
+        WHERE po.poll_id = $1
+        GROUP BY po.id, po.option_text`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var options []Option
+	var totalVotes int
+	for rows.Next() {
+		var opt Option
+		if err := rows.Scan(&opt.ID, &opt.Text, &opt.VoteCount); err != nil {
+			return nil, err
+		}
+		totalVotes += opt.VoteCount
+		options = append(options, opt)
+	}
+
+	poll.Options = options
+	return poll, nil
 }
 
-// Update writes changed FullName, PhoneNumber, Password, and AvatarPath for existing user
-func (u *User) Update() error {
-	if u.Email == "" {
-		return errors.New("email is required for update")
-	}
-
-	// Build dynamic query
-	query := "UPDATE users SET"
-	args := []interface{}{}
-	argIndex := 1
-	updates := []string{}
-
-	if u.FullName != "" {
-		updates = append(updates, fmt.Sprintf("full_name=$%d", argIndex))
-		args = append(args, u.FullName)
-		argIndex++
-	}
-	if u.PhoneNumber != "" {
-		updates = append(updates, fmt.Sprintf("phone_number=$%d", argIndex))
-		args = append(args, u.PhoneNumber)
-		argIndex++
-	}
-	if u.Password != "" {
-		updates = append(updates, fmt.Sprintf("password=$%d", argIndex))
-		args = append(args, u.Password)
-		argIndex++
-	}
-	if u.AvatarPath != "" {
-		updates = append(updates, fmt.Sprintf("avatar_path=$%d", argIndex))
-		args = append(args, u.AvatarPath)
-		argIndex++
-	}
-
-	if len(updates) == 0 {
-		return errors.New("no fields to update")
-	}
-
-	query += " " + strings.Join(updates, ", ")
-	query += fmt.Sprintf(" WHERE email=$%d", argIndex)
-	args = append(args, u.Email)
-
-	result, err := postgres.Db.Exec(query, args...)
+func GetUserPolls(email string) ([]Poll, error) {
+	rows, err := postgres.Db.Query(`
+		SELECT id, title, poll_key, expires_at
+		FROM polls
+		WHERE creator_email = $1
+		ORDER BY expires_at DESC`, email)
 	if err != nil {
-		return fmt.Errorf("failed to update user: %w", err)
+		return nil, err
 	}
+	defer rows.Close()
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to check rows affected: %w", err)
+	var polls []Poll
+	for rows.Next() {
+		var p Poll
+		if err := rows.Scan(&p.ID, &p.Title, &p.PollKey, &p.ExpiresAt); err != nil {
+			return nil, err
+		}
+		polls = append(polls, p)
 	}
-	if rowsAffected == 0 {
-		return errors.New("no user found with the provided email")
-	}
-
-	return nil
+	return polls, nil
 }

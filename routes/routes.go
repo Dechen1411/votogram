@@ -3,12 +3,18 @@ package routes
 import (
 	"net/http"
 	"votogram/controller"
+	"votogram/web"
 
 	"github.com/gorilla/mux"
 )
 
 func RegisterRoutes() *mux.Router {
 	router := mux.NewRouter()
+
+	router.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ok"))
+	}).Methods("GET")
 
 	router.HandleFunc("/", controller.IndexHandler).Methods("GET")
 	router.HandleFunc("/home", controller.DashboardHandler).Methods("GET")
@@ -38,7 +44,8 @@ func RegisterRoutes() *mux.Router {
 	router.HandleFunc("/api/vote", controller.SubmitVoteHandler).Methods("POST")
 
 	// Static file serving
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	router.PathPrefix("/static/uploads/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", web.StaticHandler()))
 
 	return router
 }

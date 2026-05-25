@@ -1,0 +1,8 @@
+.env
+*.env
+
+# Runtime uploads should not be committed.
+static/uploads/*
+web/static/uploads/*
+
+.vercel
