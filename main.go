@@ -19,6 +19,13 @@ func main() {
 		return
 	}
 
+	if os.Getenv("RUN_MIGRATIONS_ON_START") == "true" {
+		if err := postgres.ApplyMigrations(); err != nil {
+			log.Fatalf("failed to apply startup migrations: %v", err)
+		}
+		log.Println("startup database migrations applied")
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080" // Fallback port for local development

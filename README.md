@@ -64,14 +64,15 @@ This repo includes `render.yaml`, which defines:
 - A native Go web service
 - A managed Render Postgres database
 - A generated `SESSION_SECRET`
-- A pre-deploy migration command: `./votogram migrate`
+- Startup migrations via `RUN_MIGRATIONS_ON_START=true`
 
 Deploy flow:
 
 1. Commit and push this repo to GitLab/GitHub.
 2. In Render, click **New > Blueprint**.
 3. Connect the repo and choose the branch.
-4. Render reads `render.yaml`, provisions the web service and database, then runs the migration.
+4. Render reads `render.yaml`, provisions the web service and database, then starts the app.
+5. On startup, the app applies database migrations automatically.
 
 The app will be available at the service's `onrender.com` URL after deploy.
 
