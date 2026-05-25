@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votogram - Secure Online Voting System</title>
+    <title>Votogram - FAQ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/faq.css">
-
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <nav>
@@ -19,265 +17,212 @@
                     Votogram
                 </a>
                 <div class="auth-links">
-                    <a href="/login" style="color: black;">Login</a>
+                    <a href="/aboutus">About</a>
+                    <a href="/faq">FAQ</a>
+                    <a href="/login">Login</a>
                     <a href="/register" class="btn">Register</a>
                 </div>
             </nav>
         </div>
     </header>
 
-    <main class="faq-container">
-        <div class="faq-header">
-            <h1>Frequently Asked Questions</h1>
-            <p class="subtitle">Find answers to common questions about Votogram</p>
-        </div>
-
-        <div class="faq-content">
+    <main class="faq-page">
+        <section class="faq-hero container">
+            <span class="eyebrow">Voting help</span>
+            <h1>Answers for creating polls, entering keys, and reading results.</h1>
             <div class="faq-search">
-                <input type="text" placeholder="Search FAQs..." id="faqSearch">
                 <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search questions" id="faqSearch" aria-label="Search FAQ">
             </div>
+        </section>
 
-            <div class="faq-categories">
-                <button class="category-btn active" data-category="all">All Questions</button>
-                <button class="category-btn" data-category="account">Account</button>
-                <button class="category-btn" data-category="voting">Voting</button>
-                <button class="category-btn" data-category="security">Security</button>
-                <button class="category-btn" data-category="technical">Technical</button>
+        <section class="faq-content container">
+            <div class="faq-categories" aria-label="FAQ categories">
+                <button class="category-btn active" data-category="all" type="button">All</button>
+                <button class="category-btn" data-category="account" type="button">Account</button>
+                <button class="category-btn" data-category="voting" type="button">Voting</button>
+                <button class="category-btn" data-category="results" type="button">Results</button>
+                <button class="category-btn" data-category="security" type="button">Security</button>
             </div>
 
             <div class="faq-accordion">
-                <!-- Account Questions -->
-                <section class="faq-item" data-category="account">
-                    <button class="faq-question">
-                        <span>How do I create an account?</span>
+                <section class="faq-item active" data-category="account">
+                    <button class="faq-question" type="button">
+                        <span>Do I need an account to vote?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>To create an account:</p>
-                        <ol>
-                            <li>Click "Register" in the top navigation</li>
-                            <li>Fill in your full name, email, and phone number</li>
-                            <li>Create a secure password</li>
-                            <li>Verify your email address</li>
-                            <li>Complete your profile setup</li>
-                        </ol>
+                        <p>Yes. Votogram uses signed-in accounts so poll access and voting activity can be tied to a known session.</p>
                     </div>
                 </section>
 
                 <section class="faq-item" data-category="account">
-                    <button class="faq-question">
-                        <span>What if I forget my password?</span>
+                    <button class="faq-question" type="button">
+                        <span>Can I update my profile details?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Click "Forgot Password" on the login page and enter your registered email address. You'll receive a password reset link valid for 24 hours.</p>
+                        <p>Yes. After logging in, open Profile to update your name, phone number, photo, or password.</p>
                     </div>
                 </section>
 
-                <!-- Voting Questions -->
                 <section class="faq-item" data-category="voting">
-                    <button class="faq-question">
+                    <button class="faq-question" type="button">
                         <span>How do I create a poll?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>After logging in:</p>
-                        <ol>
-                            <li>Click "Create Poll" in your dashboard</li>
-                            <li>Enter your poll question</li>
-                            <li>Add at least 2 options</li>
-                            <li>Set voting parameters (duration, visibility, etc.)</li>
-                            <li>Share the poll key with participants</li>
-                        </ol>
+                        <p>Log in, open the dashboard, enter your poll question, add the voting options, set a closing time, and create the poll. The dashboard gives you a poll key to share with participants.</p>
                     </div>
                 </section>
 
                 <section class="faq-item" data-category="voting">
-                    <button class="faq-question">
-                        <span>Can I change my vote after submitting?</span>
+                    <button class="faq-question" type="button">
+                        <span>How do participants join a poll?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>This depends on the poll settings:</p>
-                        <ul>
-                            <li><strong>Single-vote polls:</strong> Votes cannot be changed once submitted</li>
-                            <li><strong>Adjustable polls:</strong> You can change your vote until the poll closes</li>
-                            <li><strong>Anonymous polls:</strong> Votes cannot be changed to preserve anonymity</li>
-                        </ul>
-                        <p>The poll creator determines these settings when creating the poll.</p>
+                        <p>Participants log in, enter the shared poll key on the dashboard, and then choose from the ballot options for that poll.</p>
                     </div>
                 </section>
 
-                <!-- Security Questions -->
+                <section class="faq-item" data-category="voting">
+                    <button class="faq-question" type="button">
+                        <span>Can someone vote more than once?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>The voting flow is designed around one submitted vote per user for a poll.</p>
+                    </div>
+                </section>
+
+                <section class="faq-item" data-category="results">
+                    <button class="faq-question" type="button">
+                        <span>When can I see results?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Results are shown from the results page after a poll is closed. Active polls stay focused on voting.</p>
+                    </div>
+                </section>
+
+                <section class="faq-item" data-category="results">
+                    <button class="faq-question" type="button">
+                        <span>Where do I find old polls?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Use the Results link in the dashboard navigation to review polls that have closed.</p>
+                    </div>
+                </section>
+
                 <section class="faq-item" data-category="security">
-                    <button class="faq-question">
-                        <span>How does Votogram prevent voting fraud?</span>
+                    <button class="faq-question" type="button">
+                        <span>What makes a poll key useful?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>We use multiple security measures:</p>
-                        <ul>
-                            <li>Phone number verification for account creation</li>
-                            <li>One-account-per-phone enforcement</li>
-                            <li>Vote encryption and blockchain-based verification</li>
-                            <li>IP address tracking for suspicious activity</li>
-                            <li>Manual review for high-stakes elections</li>
-                        </ul>
+                        <p>A poll key sends voters to the intended ballot without making them browse through unrelated polls.</p>
                     </div>
                 </section>
 
-                <!-- Technical Questions -->
-                <section class="faq-item" data-category="technical">
-                    <button class="faq-question">
-                        <span>What browsers are supported?</span>
+                <section class="faq-item" data-category="security">
+                    <button class="faq-question" type="button">
+                        <span>What browser should I use?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Votogram works on all modern browsers including:</p>
-                        <ul>
-                            <li>Google Chrome (latest 3 versions)</li>
-                            <li>Mozilla Firefox (latest 3 versions)</li>
-                            <li>Safari (latest 3 versions)</li>
-                            <li>Microsoft Edge (latest 3 versions)</li>
-                        </ul>
-                        <p>For best performance, we recommend using the latest browser version available.</p>
+                        <p>Use a recent version of Chrome, Edge, Firefox, or Safari. The interface is responsive, so it works on desktop and mobile browsers.</p>
                     </div>
                 </section>
-
-                <section class="faq-item" data-category="technical">
-                    <button class="faq-question">
-                        <span>Is there a mobile app available?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Yes! Votogram has native apps for:</p>
-                        <ul>
-                            <li>iOS (App Store)</li>
-                            <li>Android (Google Play Store)</li>
-                        </ul>
-                        <p>Our web version is also fully responsive and works on all mobile browsers.</p>
-                    </div>
-                </section>
-
-                <!-- More questions can be added here following the same structure -->
             </div>
 
             <div class="faq-contact">
-                <p>Still have questions? <a href="/contact">Contact our support team</a> and we'll be happy to help.</p>
+                <i class="fas fa-life-ring"></i>
+                <p>Still stuck? <a href="/contact">Contact support</a> with your poll key and account email.</p>
             </div>
-        </div>
+        </section>
     </main>
+
     <footer>
         <div class="container">
             <div class="footer-top">
                 <div class="footer-brand">
-                    <a href="#" class="logo">
+                    <a href="/" class="logo">
                         <i class="fas fa-vote-yea"></i>
                         Votogram
                     </a>
-                    <p>We secure your votes!</p>
+                    <p>Polls, keys, ballots, and closed results in one secure workspace.</p>
                 </div>
-
                 <div class="footer-links">
                     <div class="links-column">
-                        <h3 class="footer-heading">HELP & INFORMATION</h3>
+                        <h3 class="footer-heading">Help</h3>
                         <ul>
-                            <li><a href="/terms">Terms & Condition</a></li>
-                            <li><a href="/privacy">Privacy Policy</a></li>
+                            <li><a href="/terms">Terms</a></li>
+                            <li><a href="/privacy">Privacy</a></li>
                             <li><a href="/faq">FAQ</a></li>
                         </ul>
                     </div>
-
-                    <div class="links-column" style="margin-top: 1.7rem;">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="/aboutus">About Us</a></li>
-                            <li><a href="/help">Help Center</a></li>
-                        </ul>
-                    </div>
-
                     <div class="links-column">
-                        <h3 class="footer-heading">QUICK LINKS</h3>
+                        <h3 class="footer-heading">Quick Links</h3>
                         <ul>
                             <li><a href="/">Home</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/aboutus">About</a></li>
+                            <li><a href="/contact">Contact</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-
             <div class="footer-bottom">
                 <p>Gyalpozhing College of Information Technology, Kabesa</p>
             </div>
         </div>
     </footer>
-</body>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-            // Accordion functionality
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             const faqQuestions = document.querySelectorAll('.faq-question');
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const faqSearch = document.getElementById('faqSearch');
 
             faqQuestions.forEach(question => {
                 question.addEventListener('click', function() {
                     const item = this.parentElement;
                     item.classList.toggle('active');
 
-                    // Close other open items
-                    faqQuestions.forEach(q => {
-                        if (q !== this && q.parentElement.classList.contains('active')) {
-                            q.parentElement.classList.remove('active');
+                    faqQuestions.forEach(otherQuestion => {
+                        const otherItem = otherQuestion.parentElement;
+                        if (otherQuestion !== this && otherItem.classList.contains('active')) {
+                            otherItem.classList.remove('active');
                         }
                     });
                 });
             });
-
-            // Category filtering
-            const categoryBtns = document.querySelectorAll('.category-btn');
 
             categoryBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const category = this.dataset.category;
-
-                    // Update active button
-                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    categoryBtns.forEach(button => button.classList.remove('active'));
                     this.classList.add('active');
-
-                    // Filter questions
-                    const allQuestions = document.querySelectorAll('.faq-item');
-                    allQuestions.forEach(question => {
-                        if (category === 'all' || question.dataset.category === category) {
-                            question.style.display = 'block';
-                        } else {
-                            question.style.display = 'none';
-                        }
-                    });
+                    filterQuestions(category, faqSearch.value.toLowerCase());
                 });
             });
-
-            // Search functionality
-            const faqSearch = document.getElementById('faqSearch');
 
             faqSearch.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const questions = document.querySelectorAll('.faq-question span');
-
-                questions.forEach(q => {
-                    const item = q.parentElement.parentElement;
-                    if (q.textContent.toLowerCase().includes(searchTerm)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
+                const activeCategory = document.querySelector('.category-btn.active').dataset.category;
+                filterQuestions(activeCategory, this.value.toLowerCase());
             });
+
+            function filterQuestions(category, searchTerm) {
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const questionText = item.querySelector('.faq-question span').textContent.toLowerCase();
+                    const answerText = item.querySelector('.faq-answer').textContent.toLowerCase();
+                    const matchesCategory = category === 'all' || item.dataset.category === category;
+                    const matchesSearch = !searchTerm || questionText.includes(searchTerm) || answerText.includes(searchTerm);
+                    item.style.display = matchesCategory && matchesSearch ? 'block' : 'none';
+                });
+            }
         });
     </script>
-</script>
+</body>
 </html>

@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votogram - Secure Online Voting System</title>
+    <title>Votogram - Privacy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/privacy.css">
-    <style>
-        
-    </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <nav>
@@ -21,168 +17,92 @@
                     Votogram
                 </a>
                 <div class="auth-links">
-                    <a href="/login" style="color: black;">Login</a>
+                    <a href="/aboutus">About</a>
+                    <a href="/faq">FAQ</a>
+                    <a href="/login">Login</a>
                     <a href="/register" class="btn">Register</a>
-                </div>                
+                </div>
             </nav>
         </div>
     </header>
-    <main class="privacy-container">
-        <div class="privacy-header">
-            <h1>Privacy Policy</h1>
-            <p class="last-updated">Last updated: June 10, 2023</p>
-        </div>
 
-        <div class="privacy-content">
-            <section class="privacy-section">
-                <h2>1. Introduction</h2>
-                <p>Votogram ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our online voting platform.</p>
-            </section>
+    <main class="legal-page">
+        <section class="legal-hero container">
+            <span class="eyebrow">Privacy policy</span>
+            <h1>How Votogram handles account and voting data.</h1>
+            <p class="last-updated">Last updated: May 26, 2026</p>
+        </section>
 
-            <section class="privacy-section">
-                <h2>2. Information We Collect</h2>
-                <p>We collect the following types of information:</p>
-                
-                <h3>Personal Information</h3>
-                <ul>
-                    <li>Full name</li>
-                    <li>Email address</li>
-                    <li>Phone number (for verification)</li>
-                    <li>Account credentials</li>
-                </ul>
-                
-                <h3>Voting Data</h3>
-                <ul>
-                    <li>Poll participation records</li>
-                    <li>Vote selections (anonymous where applicable)</li>
-                    <li>Timestamp of votes</li>
-                </ul>
-                
-                <h3>Technical Information</h3>
-                <ul>
-                    <li>IP address</li>
-                    <li>Browser type and version</li>
-                    <li>Device information</li>
-                    <li>Usage data through cookies</li>
-                </ul>
-            </section>
+        <section class="legal-layout container">
+            <aside class="legal-summary">
+                <i class="fas fa-shield-alt"></i>
+                <h2>Short version</h2>
+                <p>We collect account details, poll activity, and technical data needed to run the voting platform, protect access, and show results correctly.</p>
+            </aside>
 
-            <section class="privacy-section">
-                <h2>3. How We Use Your Information</h2>
-                <p>We use the collected information for the following purposes:</p>
-                <ul>
-                    <li>To provide and maintain our Service</li>
-                    <li>To authenticate users and prevent fraud</li>
-                    <li>To ensure one vote per user in polls</li>
-                    <li>To improve and personalize user experience</li>
-                    <li>To communicate with users about their account</li>
-                    <li>To comply with legal obligations</li>
-                </ul>
-            </section>
+            <div class="legal-content">
+                <section class="legal-section">
+                    <h2>1. Information we collect</h2>
+                    <p>Votogram may collect your name, email address, phone number, password credentials, profile photo, poll creation details, vote participation records, timestamps, and basic technical data such as browser and device information.</p>
+                </section>
 
-            <section class="privacy-section">
-                <h2>4. Data Protection</h2>
-                <p>We implement appropriate security measures including:</p>
-                <ul>
-                    <li>Encryption of sensitive data</li>
-                    <li>Regular security audits</li>
-                    <li>Access controls to personal information</li>
-                    <li>Secure server infrastructure</li>
-                </ul>
-                <p>Despite these measures, no method of transmission over the Internet is 100% secure.</p>
-            </section>
+                <section class="legal-section">
+                    <h2>2. How we use information</h2>
+                    <p>We use this information to create accounts, authenticate sessions, connect voters with poll keys, record submitted votes, display closed-poll results, troubleshoot support requests, and improve reliability.</p>
+                </section>
 
-            <section class="privacy-section">
-                <h2>5. Data Sharing</h2>
-                <p>We do not sell your personal information. We may share data with:</p>
-                <ul>
-                    <li>Service providers who assist in platform operations</li>
-                    <li>Law enforcement when legally required</li>
-                    <li>Poll creators (only anonymous, aggregated results)</li>
-                </ul>
-            </section>
+                <section class="legal-section">
+                    <h2>3. Voting records</h2>
+                    <p>The platform stores poll and vote data so each poll can be counted and reviewed. Poll creators and participants may see result totals when the poll is closed, depending on the app flow.</p>
+                </section>
 
-            <section class="privacy-section">
-                <h2>6. Cookies and Tracking</h2>
-                <p>We use cookies and similar technologies to:</p>
-                <ul>
-                    <li>Maintain user sessions</li>
-                    <li>Remember preferences</li>
-                    <li>Analyze platform usage</li>
-                </ul>
-                <p>You can control cookies through your browser settings.</p>
-            </section>
+                <section class="legal-section">
+                    <h2>4. Security</h2>
+                    <p>We use account sessions, database access controls, and deployment environment secrets to protect the application. No online system can be guaranteed completely secure, so users should keep passwords private and report suspicious activity.</p>
+                </section>
 
-            <section class="privacy-section">
-                <h2>7. Your Rights</h2>
-                <p>You have the right to:</p>
-                <ul>
-                    <li>Access your personal data</li>
-                    <li>Request correction of inaccurate data</li>
-                    <li>Request deletion of your data</li>
-                    <li>Withdraw consent for data processing</li>
-                    <li>Receive your data in a portable format</li>
-                </ul>
-                <p>To exercise these rights, please contact us at privacy@votogram.com.</p>
-            </section>
+                <section class="legal-section">
+                    <h2>5. Sharing</h2>
+                    <p>We do not sell personal information. We may share information when required to operate hosting, database, or support services, or when required by law.</p>
+                </section>
 
-            <section class="privacy-section">
-                <h2>8. Children's Privacy</h2>
-                <p>Our Service is not intended for users under 18. We do not knowingly collect personal information from children.</p>
-            </section>
-
-            <section class="privacy-section">
-                <h2>9. Changes to This Policy</h2>
-                <p>We may update this Privacy Policy periodically. We will notify users of significant changes through our platform or via email.</p>
-            </section>
-
-        </div>
+                <section class="legal-section">
+                    <h2>6. Your choices</h2>
+                    <p>You can update profile details from your account page. For privacy questions or data requests, contact the Votogram team with the account email connected to your request.</p>
+                </section>
+            </div>
+        </section>
     </main>
+
     <footer>
         <div class="container">
             <div class="footer-top">
                 <div class="footer-brand">
-                    <a href="#" class="logo">
+                    <a href="/" class="logo">
                         <i class="fas fa-vote-yea"></i>
                         Votogram
                     </a>
-                    <p>We secure your votes!</p>
+                    <p>Polls, keys, ballots, and closed results in one secure workspace.</p>
                 </div>
-                
                 <div class="footer-links">
                     <div class="links-column">
-                        <h3 class="footer-heading">HELP & INFORMATION</h3>
+                        <h3 class="footer-heading">Help</h3>
                         <ul>
-                            <li><a href="/terms">Terms & Condition</a></li>
-                            <li><a href="/privacy">Privacy Policy</a></li>
+                            <li><a href="/terms">Terms</a></li>
+                            <li><a href="/privacy">Privacy</a></li>
                             <li><a href="/faq">FAQ</a></li>
                         </ul>
                     </div>
-                    
-                    <div class="links-column" style="margin-top: 1.7rem;">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="/aboutus">About Us</a></li>
-                            <li><a href="/help">Help Center</a></li>
-                        </ul>
-                    </div>
-                    
                     <div class="links-column">
-                        <h3 class="footer-heading">QUICK LINKS</h3>
+                        <h3 class="footer-heading">Quick Links</h3>
                         <ul>
                             <li><a href="/">Home</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="links-column">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/aboutus">About</a></li>
+                            <li><a href="/contact">Contact</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-            
             <div class="footer-bottom">
                 <p>Gyalpozhing College of Information Technology, Kabesa</p>
             </div>

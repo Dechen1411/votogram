@@ -5,69 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Votogram - Register</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/register.css">
 </head>
-<body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="logo">
-                    <i class="fas fa-vote-yea"></i>
-                    <span>Votogram</span>
+<body class="auth-page">
+    <main class="auth-shell register-shell">
+        <section class="auth-story" aria-label="Account setup preview">
+            <a href="/" class="auth-logo">
+                <i class="fas fa-vote-yea"></i>
+                <span>Votogram</span>
+            </a>
+            <div class="auth-story-copy">
+                <span class="eyebrow">Create voter access</span>
+                <h1>Build a clean identity for polls, keys, and final results.</h1>
+                <p>Your account keeps voting activity tied to a verified profile while poll choices stay handled through the app flow.</p>
+            </div>
+            <div class="auth-ballot setup-list">
+                <div class="setup-step">
+                    <span>01</span>
+                    <div>
+                        <strong>Account details</strong>
+                        <p>Name, email, and phone number.</p>
+                    </div>
                 </div>
-                <h1>Create Your Account</h1>
-                <p>Join Votogram to participate in secure online voting</p>
+                <div class="setup-step">
+                    <span>02</span>
+                    <div>
+                        <strong>Secure password</strong>
+                        <p>At least eight characters with a number.</p>
+                    </div>
+                </div>
+                <div class="setup-step">
+                    <span>03</span>
+                    <div>
+                        <strong>Ready to vote</strong>
+                        <p>Create polls or enter a shared poll key.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-card" aria-labelledby="registerTitle">
+            <div class="auth-header">
+                <span class="eyebrow">Voter profile</span>
+                <h2 id="registerTitle">Create your account</h2>
+                <p>Use details you can recognize later when managing polls and profile security.</p>
             </div>
 
             <form id="registrationForm" class="auth-form">
                 <div class="form-group">
-                    <label for="fullName">Full Name</label>
+                    <label for="fullName">Full name</label>
                     <div class="input-with-icon">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" pattern="[A-Za-z\s]{3,}" title="Name should only contain letters and spaces, minimum 3 characters" required>
+                        <input type="text" id="fullName" name="fullName" placeholder="Your full name" pattern="[A-Za-z\s]{3,}" title="Name should only contain letters and spaces, minimum 3 characters" autocomplete="name" required>
                     </div>
                     <div class="error-message" id="fullNameError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Email Address</label>
+                    <label for="email">Email address</label>
                     <div class="input-with-icon">
                         <i class="fas fa-envelope"></i>
-                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                        <input type="email" id="email" name="email" placeholder="name@example.com" autocomplete="email" required>
                     </div>
                     <div class="error-message" id="emailError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="phone">Phone Number</label>
+                    <label for="phone">Phone number</label>
                     <div class="input-with-icon">
                         <i class="fas fa-phone"></i>
-                        <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                        <input type="tel" id="phone" name="phone" placeholder="17xxxxxx or 77xxxxxx" autocomplete="tel" required>
                     </div>
                     <div class="error-message" id="phoneError"></div>
                 </div>
 
-                <div class="form-group">    
+                <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-wrapper">
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="password" name="password" placeholder="Create a password" required>
+                            <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password" required>
                         </div>
-                        <i class="fas fa-eye toggle-password"></i>
+                        <i class="fas fa-eye toggle-password" aria-label="Toggle password visibility"></i>
                     </div>
                     <div class="error-message" id="passwordError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
+                    <label for="confirmPassword">Confirm password</label>
                     <div class="password-wrapper">
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat your password" autocomplete="new-password" required>
                         </div>
-                        <i class="fas fa-eye toggle-password"></i>
+                        <i class="fas fa-eye toggle-password" aria-label="Toggle password visibility"></i>
                     </div>
                     <div class="error-message" id="confirmPasswordError"></div>
                 </div>
@@ -79,10 +111,11 @@
             </form>
 
             <div class="auth-footer">
-                <p>Already have an account? <a href="/login">Login here</a></p>
+                <p>Already registered? <a href="/login">Login instead</a></p>
+                <a class="back-home" href="/">Back to home</a>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script src="/static/js/register.js"></script>
 </body>

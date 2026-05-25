@@ -5,7 +5,7 @@ function showModal(message, type = 'success') {
     modal.style.display = 'flex';
     modal.innerHTML = `
         <div class="modal-content">
-            <span class="close">×</span>
+            <span class="close" aria-label="Close">&times;</span>
             <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
             <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
         </div>

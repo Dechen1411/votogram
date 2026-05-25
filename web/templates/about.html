@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votogram - Secure Online Voting System</title>
+    <title>Votogram - About</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/about.css">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <nav>
@@ -18,151 +17,111 @@
                     Votogram
                 </a>
                 <div class="auth-links">
-                    <a href="/login" style="color: black;">Login</a>
+                    <a href="/aboutus">About</a>
+                    <a href="/faq">FAQ</a>
+                    <a href="/login">Login</a>
                     <a href="/register" class="btn">Register</a>
                 </div>
             </nav>
         </div>
     </header>
-    <main class="about-container">
-        <!-- Hero Section -->
-        <section class="about-hero">
-            <div class="hero-content">
-                <h1>Democratizing Voting Through Technology</h1>
-                <p class="hero-subtitle">Secure, accessible, and transparent online voting for everyone</p>
-            </div>
-        </section>
 
-        <!-- Our Story Section -->
-        <section class="about-section">
-            <div class="section-content">
-                <h2>Our Story</h2>
-                <div class="story-grid">
-                    <div class="story-text">
-                        <p>Founded in 2025 at Gyalpozhing College of Information Technology, Votogram began as a student project to address the challenges of traditional voting systems in Bhutan's remote communities.</p>
-                        <p>What started as a simple prototype has grown into Bhutan's most trusted online voting platform, now serving organizations, educational institutions, and community groups across the country.</p>
-                        <p>Our team of passionate developers and democracy advocates continue to innovate, making secure digital voting accessible to all.</p>
+    <main class="about-page">
+        <section class="about-hero container">
+            <div class="about-copy">
+                <span class="eyebrow">Built for decisions</span>
+                <h1>A voting workspace for communities that need clear polls and clean results.</h1>
+                <p>Votogram helps organizers create polls, share private poll keys, collect votes, and publish results after the poll closes.</p>
+                <div class="about-actions">
+                    <a href="/register" class="btn">Start a poll</a>
+                    <a href="/faq" class="btn btn-outline">Read FAQ</a>
+                </div>
+            </div>
+            <div class="about-ballot" aria-label="Ballot workflow preview">
+                <div class="ballot-header">
+                    <span>Poll workflow</span>
+                    <strong>3 STEPS</strong>
+                </div>
+                <div class="workflow-row">
+                    <i class="fas fa-edit"></i>
+                    <div>
+                        <strong>Create</strong>
+                        <span>Question, options, and close time</span>
                     </div>
-                    <div class="story-image">
-                        <img src="/static/images/about-founders.jpg" alt="Votogram founding team at GCIT">
+                </div>
+                <div class="workflow-row active">
+                    <i class="fas fa-key"></i>
+                    <div>
+                        <strong>Share key</strong>
+                        <span>Participants enter the poll securely</span>
+                    </div>
+                </div>
+                <div class="workflow-row">
+                    <i class="fas fa-chart-bar"></i>
+                    <div>
+                        <strong>Review results</strong>
+                        <span>Totals unlock after closing</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Mission Section -->
-        <section class="about-section mission-section">
-            <div class="section-content">
-                <h2>Our Mission</h2>
-                <div class="mission-statement">
-                    <p class="mission-text">"To empower communities with transparent, secure, and accessible voting technology that strengthens democratic participation."</p>
-                </div>
-
-                <div class="mission-cards">
-                    <div class="mission-card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h3>Security First</h3>
-                        <p>Ensure secure votes</p>
-                    </div>
-
-                    <div class="mission-card">
-                        <div class="card-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3>Accessibility</h3>
-                        <p>Designed for all citizens, regardless of location or technical ability</p>
-                    </div>
-
-                    <div class="mission-card">
-                        <div class="card-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3>Community Focus</h3>
-                        <p>Built by Bhutanese, for Bhutanese democratic needs</p>
-                    </div>
-                </div>
+        <section class="about-band">
+            <div class="container section-title">
+                <span class="eyebrow">Why it exists</span>
+                <h2>Less confusion around online voting.</h2>
+                <p>The app focuses on the moments that matter most: creating a poll, joining the right poll, voting once, and checking results when the poll is done.</p>
+            </div>
+            <div class="container value-grid">
+                <article class="value-card">
+                    <i class="fas fa-fingerprint"></i>
+                    <h3>Account-based access</h3>
+                    <p>Voters sign in before using poll keys, giving organizers a steadier participation flow.</p>
+                </article>
+                <article class="value-card">
+                    <i class="fas fa-key"></i>
+                    <h3>Poll key entry</h3>
+                    <p>Each poll can be shared through a key, so participants land on the exact ballot they need.</p>
+                </article>
+                <article class="value-card">
+                    <i class="fas fa-hourglass-end"></i>
+                    <h3>Closed-poll results</h3>
+                    <p>Results are treated as a final review surface once the active voting period is over.</p>
+                </article>
             </div>
         </section>
 
-        <!-- Team Section -->
-        <section class="about-section team-section">
-            <div class="section-content">
-                <h2>Our Team</h2>
-                <p class="section-intro">The passionate individuals behind Votogram's success</p>
-
-                <div class="team-grid">
-                    <div class="team-member">
-                        <img src="/static/images/team-member1.jpg" alt="Tshering Dorji">
-                        <h3>Sangay Dorji</h3>
-                        <p class="role">Founder & CEO</p>
-                        <p class="bio">Computer Science student from GCIT with a vision for digital democracy</p>
-                    </div>
-
-                    <div class="team-member">
-                        <img src="/static/images/team-member2.jpg" alt="Pema Wangmo">
-                        <h3>Tandin Wangmo</h3>
-                        <p class="role">Security Lead</p>
-                        <p class="bio">Cybersecurity specialist ensuring voter privacy and system integrity</p>
-                    </div>
-
-                    <div class="team-member">
-                        <img src="/static/images/team-member3.jpg" alt="Karma Yeshi">
-                        <h3>Tara Acharja</h3>
-                        <p class="role">UX Designer</p>
-                        <p class="bio">Making complex voting processes simple for all users</p>
-                    </div>
-
-                    <div class="team-member">
-                        <img src="/static/images/team-member4.jpg" alt="Sonam Lhamo">
-                        <h3>Pelchen Lhamo</h3>
-                        <p class="role">Community Outreach</p>
-                        <p class="bio">Connecting with villages to understand real voting challenges</p>
+        <section class="container principles-section">
+            <div class="section-title">
+                <span class="eyebrow">Product principles</span>
+                <h2>Designed around voter trust.</h2>
+            </div>
+            <div class="principles-list">
+                <div class="principle-item">
+                    <span>01</span>
+                    <div>
+                        <h3>Make choices obvious</h3>
+                        <p>Ballots should be readable, direct, and hard to misinterpret.</p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Values Section -->
-        <section class="about-section values-section">
-            <div class="section-content">
-                <h2>Our Values</h2>
-                <div class="values-list">
-                    <div class="value-item">
-                        <h3><span class="value-number">01</span> Transparency</h3>
-                        <p>Open-source algorithms and verifiable results build trust in every election</p>
-                    </div>
-
-                    <div class="value-item">
-                        <h3><span class="value-number">02</span> Innovation</h3>
-                        <p>Continually improving our technology to serve Bhutan's unique needs</p>
-                    </div>
-
-                    <div class="value-item">
-                        <h3><span class="value-number">03</span> Integrity</h3>
-                        <p>Uncompromising ethical standards in every aspect of our work</p>
-                    </div>
-
-                    <div class="value-item">
-                        <h3><span class="value-number">04</span> Inclusivity</h3>
-                        <p>Designing for all citizens, including those in remote regions</p>
+                <div class="principle-item">
+                    <span>02</span>
+                    <div>
+                        <h3>Keep organizers in control</h3>
+                        <p>Poll creation, sharing, and result review should stay close together.</p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="about-cta">
-            <div class="cta-content">
-                <h2>Ready to experience secure online voting?</h2>
-                <div class="cta-buttons">
-                    <a href="/register" class="btn btn-primary">Get Started</a>
-                    <a href="/contact" class="btn btn-secondary">Contact Us</a>
+                <div class="principle-item">
+                    <span>03</span>
+                    <div>
+                        <h3>Use calm security</h3>
+                        <p>The interface should feel serious without making voting feel complicated.</p>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
+
     <footer>
         <div class="container">
             <div class="footer-top">
@@ -171,48 +130,31 @@
                         <i class="fas fa-vote-yea"></i>
                         Votogram
                     </a>
-                    <p>We secure your votes!</p>
+                    <p>Polls, keys, ballots, and closed results in one secure workspace.</p>
                 </div>
-
                 <div class="footer-links">
                     <div class="links-column">
-                        <h3 class="footer-heading">HELP & INFORMATION</h3>
+                        <h3 class="footer-heading">Help</h3>
                         <ul>
-                            <li><a href="/terms">Terms & Condition</a></li>
-                            <li><a href="/privacy">Privacy Policy</a></li>
+                            <li><a href="/terms">Terms</a></li>
+                            <li><a href="/privacy">Privacy</a></li>
                             <li><a href="/faq">FAQ</a></li>
                         </ul>
                     </div>
-
-                    <div class="links-column" style="margin-top: 1.7rem;">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="/aboutus">About Us</a></li>
-                            <li><a href="/help">Help Center</a></li>
-                        </ul>
-                    </div>
-
                     <div class="links-column">
-                        <h3 class="footer-heading">QUICK LINKS</h3>
+                        <h3 class="footer-heading">Quick Links</h3>
                         <ul>
                             <li><a href="/">Home</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="links-column">
-                        <h3 class="footer-heading">&nbsp;</h3>
-                        <ul>
-                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/aboutus">About</a></li>
+                            <li><a href="/contact">Contact</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-
             <div class="footer-bottom">
                 <p>Gyalpozhing College of Information Technology, Kabesa</p>
             </div>
         </div>
     </footer>
-    </body>
 </body>
 </html>

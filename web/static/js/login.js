@@ -5,7 +5,7 @@ function showModal(message, type = 'success') {
     modal.style.display = 'flex';
     modal.innerHTML = `
         <div class="modal-content">
-            <span class="close">×</span>
+            <span class="close" aria-label="Close">&times;</span>
             <h2>${type === 'success' ? 'Success' : 'Error'}</h2>
             <p class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</p>
         </div>
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Validate Email
         const email = document.getElementById('email').value.trim();
         if (!email) {
-            document.getElement('emailError').textContent = 'Email is required';
+            document.getElementById('emailError').textContent = 'Email is required';
             document.getElementById('email').classList.add('invalid');
             isValid = false;
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

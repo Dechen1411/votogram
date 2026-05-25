@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (/\d/.test(pwd)) score++;
         if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score++;
         if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++;
-        const colors = ['#ff4d4d', '#ff9800', '#4CAF50', '#28a745'];
+        const colors = ['#b42318', '#c4821f', '#197c7a', '#176b4d'];
         const texts  = ['Very Weak', 'Weak', 'Good', 'Strong'];
         strengthBars.forEach((bar, i) => {
             bar.style.backgroundColor = i < score ? colors[score-1] : '#ddd';
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
         strengthText.textContent = score ? texts[score-1] : 'Password Strength';
     });
 
-    // Cancel → reload to reset fields
+    // Cancel -> reload to reset fields
     cancelBtn.addEventListener('click', () => window.location.reload());
 
     // Submit profile form

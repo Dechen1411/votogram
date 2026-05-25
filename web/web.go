@@ -7,7 +7,7 @@ import (
 	"text/template"
 )
 
-//go:embed templates/* static/css/* static/js/*
+//go:embed templates/* static/css/* static/js/* static/images/*
 var files embed.FS
 
 func ParseTemplate(name string) (*template.Template, error) {
