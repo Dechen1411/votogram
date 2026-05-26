@@ -7,9 +7,10 @@ var migrationStatements = []string{
 		phone_number VARCHAR(20),
 		email VARCHAR(255) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,
-		avatar_path VARCHAR(255),
+		avatar_path TEXT,
 		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 	)`,
+	`ALTER TABLE users ALTER COLUMN avatar_path TYPE TEXT`,
 	`CREATE TABLE IF NOT EXISTS polls (
 		id SERIAL PRIMARY KEY,
 		creator_email VARCHAR(255) NOT NULL,

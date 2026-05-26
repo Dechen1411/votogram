@@ -1,15 +1,14 @@
 package controller
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
-	"time"
 	"votogram/model"
 	"votogram/utils/httpResp"
 
@@ -168,8 +167,9 @@ func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Limit file size to 5MB
-	if err := r.ParseMultipartForm(5 << 20); err != nil {
+	const maxAvatarBytes = 5 << 20
+
+	if err := r.ParseMultipartForm(maxAvatarBytes); err != nil {
 		httpResp.RespondWithError(w, http.StatusBadRequest, "Invalid file upload")
 		return
 	}
@@ -187,41 +187,32 @@ func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create uploads directory if it doesn't exist
-	uploadDir := "static/uploads"
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
-		log.Printf("Error creating upload directory: %v", err)
-		httpResp.RespondWithError(w, http.StatusInternalServerError, "Failed to create upload directory")
-		return
-	}
-
-	// Generate unique filename
-	filename := fmt.Sprintf("%s_%d%s", email, time.Now().UnixNano(), ext)
-	filePath := filepath.Join(uploadDir, filename)
-
-	// Save file
-	dst, err := os.Create(filePath)
+	imageBytes, err := io.ReadAll(io.LimitReader(file, maxAvatarBytes+1))
 	if err != nil {
-		log.Printf("Error creating file: %v", err)
-		httpResp.RespondWithError(w, http.StatusInternalServerError, "Failed to save file")
+		log.Printf("Error reading avatar: %v", err)
+		httpResp.RespondWithError(w, http.StatusInternalServerError, "Failed to read avatar")
 		return
 	}
-	defer dst.Close()
-
-	if _, err := io.Copy(dst, file); err != nil {
-		log.Printf("Error saving file: %v", err)
-		httpResp.RespondWithError(w, http.StatusInternalServerError, "Failed to save file")
+	if len(imageBytes) > maxAvatarBytes {
+		httpResp.RespondWithError(w, http.StatusBadRequest, "Avatar must be 5MB or smaller")
 		return
 	}
 
-	// Update user's avatar_path in database
+	contentType := http.DetectContentType(imageBytes)
+	if contentType != "image/jpeg" && contentType != "image/png" {
+		httpResp.RespondWithError(w, http.StatusBadRequest, "Only JPG and PNG files are allowed")
+		return
+	}
+
 	user := model.User{Email: email}
 	if err := user.FindByEmail(email); err != nil {
 		log.Printf("User not found: %v", err)
 		httpResp.RespondWithError(w, http.StatusUnauthorized, "User not found")
 		return
 	}
-	user.AvatarPath = "/static/uploads/" + filename
+
+	encodedAvatar := base64.StdEncoding.EncodeToString(imageBytes)
+	user.AvatarPath = fmt.Sprintf("data:%s;base64,%s", contentType, encodedAvatar)
 	if err := user.Update(); err != nil {
 		log.Printf("Error updating avatar: %v", err)
 		httpResp.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to update avatar: %s", err.Error()))
