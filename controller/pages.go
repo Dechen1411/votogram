@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"votogram/model"
-	"votogram/session"
 	"votogram/web"
 )
 
@@ -13,10 +12,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	sessionObj, _ := session.Store.Get(r, "votogram-session")
-	auth, ok := sessionObj.Values["authenticated"].(bool)
-	if !ok || !auth {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if _, ok := requirePageAuth(w, r); !ok {
 		return
 	}
 
@@ -48,10 +44,8 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProfileHandler(w http.ResponseWriter, r *http.Request) {
-	sess, _ := session.Store.Get(r, "votogram-session")
-	email, ok := sess.Values["email"].(string)
-	if !ok || email == "" {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	email, ok := requirePageAuth(w, r)
+	if !ok {
 		return
 	}
 
@@ -81,6 +75,10 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ResultsHandler(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requirePageAuth(w, r); !ok {
+		return
+	}
+
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")

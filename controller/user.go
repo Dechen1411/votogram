@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 	"votogram/datastore/postgres"
-	"votogram/session"
 	"votogram/web"
 
 	"github.com/gorilla/mux"
@@ -28,10 +27,8 @@ func GeneratePollKey() (string, error) {
 }
 
 func CreatePollHandler(w http.ResponseWriter, r *http.Request) {
-	sessionObj, _ := session.Store.Get(r, "votogram-session")
-	email, ok := sessionObj.Values["email"].(string)
+	email, ok := requireAuth(w, r)
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -107,6 +104,10 @@ func CreatePollHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func JoinPollHandler(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requireAuth(w, r); !ok {
+		return
+	}
+
 	var req struct {
 		PollKey string `json:"poll_key"`
 	}
@@ -129,6 +130,10 @@ func JoinPollHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func VoteHandler(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requirePageAuth(w, r); !ok {
+		return
+	}
+
 	pollID := r.URL.Query().Get("id")
 	if pollID == "" {
 		http.Error(w, "Poll ID required", http.StatusBadRequest)
@@ -201,10 +206,8 @@ func VoteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
-	sessionObj, _ := session.Store.Get(r, "votogram-session")
-	email, ok := sessionObj.Values["email"].(string)
+	email, ok := requireAuth(w, r)
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -311,6 +314,10 @@ func SubmitVoteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PollDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requireAuth(w, r); !ok {
+		return
+	}
+
 	vars := mux.Vars(r)
 	pollID := vars["pollID"]
 
@@ -370,6 +377,10 @@ func PollDetailsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PollResultsHandler(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requireAuthJSON(w, r); !ok {
+		return
+	}
+
 	vars := mux.Vars(r)
 	pollID := vars["pollID"]
 
@@ -464,16 +475,9 @@ func PollResultsHandler(w http.ResponseWriter, r *http.Request) {
 
 func ListExpiredPollsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling /api/polls/expired request")
-	sessionObj, _ := session.Store.Get(r, "votogram-session")
-	email, ok := sessionObj.Values["email"].(string)
+	email, ok := requireAuthJSON(w, r)
 	if !ok {
 		log.Println("Unauthorized: No valid session")
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "error",
-			"message": "Unauthorized",
-		})
 		return
 	}
 
@@ -572,16 +576,9 @@ func ListExpiredPollsHandler(w http.ResponseWriter, r *http.Request) {
 
 func ListUserPollsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling /api/polls/user request")
-	sessionObj, _ := session.Store.Get(r, "votogram-session")
-	email, ok := sessionObj.Values["email"].(string)
+	email, ok := requireAuthJSON(w, r)
 	if !ok {
 		log.Println("Unauthorized: No valid session")
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "error",
-			"message": "Unauthorized",
-		})
 		return
 	}
 

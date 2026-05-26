@@ -79,13 +79,9 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	sessionObj, err := session.Store.Get(r, "votogram-session")
-	if err != nil {
-		log.Printf("Session error: %v", err)
-		httpResp.RespondWithError(w, http.StatusInternalServerError, "Session error")
-		return
-	}
-	sessionObj.Values["authenticated"] = false
+	sessionObj, _ := session.Store.Get(r, "votogram-session")
+	delete(sessionObj.Values, "authenticated")
+	delete(sessionObj.Values, "email")
 	sessionObj.Options.MaxAge = -1
 	if err := sessionObj.Save(r, w); err != nil {
 		log.Printf("Error saving session: %v", err)
@@ -93,19 +89,15 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
-	sess, err := session.Store.Get(r, "votogram-session")
-	if err != nil {
-		log.Printf("Session error: %v", err)
-		httpResp.RespondWithError(w, http.StatusInternalServerError, "Session error")
-		return
-	}
-	email, ok := sess.Values["email"].(string)
+	email, ok := requireAuthJSON(w, r)
 	if !ok {
-		httpResp.RespondWithError(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 
@@ -171,15 +163,8 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
-	sess, err := session.Store.Get(r, "votogram-session")
-	if err != nil {
-		log.Printf("Session error: %v", err)
-		httpResp.RespondWithError(w, http.StatusInternalServerError, "Session error")
-		return
-	}
-	email, ok := sess.Values["email"].(string)
+	email, ok := requireAuthJSON(w, r)
 	if !ok {
-		httpResp.RespondWithError(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 
