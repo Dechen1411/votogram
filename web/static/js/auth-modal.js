@@ -1,7 +1,7 @@
 (function() {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phonePattern = /^(17|77)\d{6}$/;
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
     document.addEventListener('DOMContentLoaded', function() {
         const authLinks = document.querySelectorAll('a[href="/login"], a[href="/register"]');

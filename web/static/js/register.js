@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Password validation (minimum 8 chars, at least 1 letter and 1 number)
     function validatePassword(password) {
-        const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const regex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
         return regex.test(password);
     }
 
